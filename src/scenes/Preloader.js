@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { WIDTH, HEIGHT } from '../const';
+import assets from '../assets.js'
 
 export class Preloader extends Scene {
     constructor() {
@@ -7,7 +8,7 @@ export class Preloader extends Scene {
     }
 
     init() {
-
+        // --- Прогрес бар ---
         this.add.rectangle(WIDTH/2, HEIGHT/2, 468, 32).setStrokeStyle(1, 0xffffff);
         const bar = this.add.rectangle(WIDTH/2-230, HEIGHT/2, 4, 28, 0xffffff);
         this.load.on('progress', (progress) => {
@@ -17,14 +18,17 @@ export class Preloader extends Scene {
     }
 
     preload() {
-        this.load.setPath('assets');
+        // --- изображения ---
+        for (const key in assets.image) {
+            const item = assets.image[key];
+            this.load.image(item.key, item.args[0]);
+        }
 
-        this.load.image('person', 'person.png');
-        this.load.image('logo', 'logo.png');
-        this.load.image('button', 'button.png');
-        this.load.image('menubg', 'menu.png');
-        this.load.image('bg', 'bg.png');
-        this.load.image('ground', 'ground.png');
+        // --- спрайт листы --- 
+        for (const key in assets.spritesheet) {
+            const item = assets.spritesheet[key];
+            this.load.spritesheet(item.key, item.args[0], item.args[1]);
+        }
     }
 
     create() {
