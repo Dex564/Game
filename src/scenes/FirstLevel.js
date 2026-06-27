@@ -15,6 +15,7 @@ export class FirstLevel extends Scene {
         this.player = this.physics.add.sprite(WIDTH/2, HEIGHT/2, 'person');
 
         // this.player.setBounce(0.2);
+        // test
         this.player.setCollideWorldBounds(true);
 
         this.cursors = this.input.keyboard.createCursorKeys();
