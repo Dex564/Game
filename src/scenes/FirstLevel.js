@@ -30,17 +30,21 @@ export class FirstLevel extends Scene {
 
         this.canDash = true;
         this.isDashing = false;
+        this.isRunning = false;
 
-        // --- Уровень ---
+        // --- Генерация уровня ---
         this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(Const.WIDTH, Const.HEIGHT*2 - 20, 'ground').setScale(15, 1).refreshBody();
-
-        this.physics.world.setBounds(0, 0, Const.WIDTH*2, Const.HEIGHT*2);
+        this.generateLevel();
         this.physics.add.collider(this.player, this.platforms);
-        for (let i = 0; i < 10; i++) {
-            this.platforms.create(getRandomInt(0, Const.WIDTH*2), Const.HEIGHT*2/5*i, 'ground');
-        }
+        
+        const spawnX = 960 / 2;
+        const spawnY = Const.HEIGHT * 2;
+        this.player.setPosition(spawnX, spawnY - 100);
 
+        // Границы мира
+        this.physics.world.setBounds(0, 0, Const.WIDTH * 2, Const.HEIGHT * 2 - 24);
+
+        // --- Камера ---
         var camera = this.cameras.add(
             0,
             0,
@@ -50,10 +54,9 @@ export class FirstLevel extends Scene {
             'FirstLevelCam'
         );
         
-        // --- Камера ---
         camera.startFollow(this.player, false, 0.1, 1);
         camera.setBounds(0, 0, Const.WIDTH*2, Const.HEIGHT*2, true);
-        // camera.setZoom(0.5, 0.5);
+        camera.setZoom(1, 1);
     }
 
     update() {
@@ -126,12 +129,26 @@ export class FirstLevel extends Scene {
                 this.player.play('idle', true);
                 return;
             } else if (this.keys.left.isDown || this.keys.right.isDown) {
-                this.player.play('run', true);
+                if (!this.isRunning) {
+                    this.player.play('startrun', true)
+                    this.time.delayedCall(150, () => { // время, через которое начнётся бег // переход с начала бега в бег
+                        this.isRunning = true;
+                    });
+                } else {
+                    this.player.play('run', true);
+                }
             } else {
                 this.player.play('idle', true);
             }
         } else {
             this.player.play('jump', true);
+        }
+    }
+
+    generateLevel() {
+        this.platforms.create(Const.WIDTH, Const.HEIGHT*2 - 20, 'ground').setScale(15, 1).refreshBody();
+        for (let i = 0; i < 15; i++) {
+            this.platforms.create(getRandomInt(0, Const.WIDTH*2), Const.HEIGHT*2/5*i, 'ground');
         }
     }
 }
