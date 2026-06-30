@@ -27,6 +27,10 @@ export default {
         platform_vertical: {
             key: 'platform_vertical',
             args: ['assets/platform_vertical.png']
+        },
+        cave_entry: {
+            key: 'cave_entry',
+            args: ['assets/cave_entry.png']
         }
     },
     'spritesheet': {

@@ -2,6 +2,7 @@ import { Boot } from './scenes/Boot';
 import { Lobby } from './scenes/Lobby';
 import { Game } from 'phaser';
 import { MainMenu } from './scenes/MainMenu';
+import { CaveLevel } from './scenes/CaveLevel';
 import { Preloader } from './scenes/Preloader';
 import * as Phaser from 'phaser';
 import { WIDTH, HEIGHT } from './const';
@@ -27,7 +28,8 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
-        Lobby
+        Lobby,
+        CaveLevel
     ]
 };
 

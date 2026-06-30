@@ -2,58 +2,50 @@ import { Scene } from 'phaser';
 import * as Phaser from 'phaser';
 import * as Const from '../const.js';
 import { getRandomInt, getRandomFloat } from '../utils.js';
-import { createPlayerAnimations } from '../animations.js';
 
-export class PlayerClass extends Scene {
-    constructor(sceneName) {
-        super(sceneName);
+export class PlayerClass {
+    constructor(scene, worldX = Const.WIDTH, worldY = Const.HEIGHT) {
         this.player = null;
-        this.platforms = null;
+        this.scene = scene;
+        this.worldX = worldX;
+        this.worldY = worldY;
     }
 
-    createPlayer(x, y) {
-        this.player = this.physics.add.sprite(Const.WIDTH/2, Const.HEIGHT/2, 'person');
+    createPlayer() {
+        this.player = this.scene.physics.add.sprite(this.worldX / 2, this.worldY / 2, 'person');
         this.player.setCollideWorldBounds(true);
-        createPlayerAnimations(this.anims);
         this.player.play('idle');
 
-        this.keys = this.input.keyboard.addKeys({
+        this.keys = this.scene.input.keyboard.addKeys({
             up: 'w',
             down: 's',
             left: 'a',
             right: 'd',
             dash: 'q'
         });
-        this.spaceButton = this.input.keyboard.addKey('space');
-        this.shiftButton = this.input.keyboard.addKey("SHIFT")
+        this.spaceButton = this.scene.input.keyboard.addKey('space');
+        this.shiftButton = this.scene.input.keyboard.addKey("SHIFT")
 
         this.canDash = true;
         this.isDashing = false;
         this.isRunning = false;
 
-        // --- Генерация уровня ---
-        // this.platforms = this.physics.add.staticGroup();
-        // // this.generateLevel();
-        // this.physics.add.collider(this.player, this.platforms);
-        
-        // const spawnX = 960 / 2;
-        // const spawnY = Const.HEIGHT * 2;
-        this.player.setPosition(x, y);
+        this.createCamera();
+        return this.player;
+    }
 
-        // Границы мира
-        this.physics.world.setBounds(0, 0, Const.WIDTH, Const.HEIGHT - 24);
-
+    createCamera() {
         // --- Камера ---
-        var camera = this.cameras.add(
+        const camera = this.scene.cameras.add(
             0,
             0,
-            Const.WIDTH,
-            Const.HEIGHT,
+            this.worldX,
+            this.worldY,
             true
         );
-        
-        camera.startFollow(this.player, false, 0.1, 1);
-        camera.setBounds(0, 0, Const.WIDTH, Const.HEIGHT, true);
+
+        camera.startFollow(this.player, true, 0.1, 1);
+        camera.setBounds(0, 0, this.worldX, this.worldY, true);
         camera.setZoom(2, 2);
     }
 
@@ -86,7 +78,7 @@ export class PlayerClass extends Scene {
 
             this.updateAnimation();
         }
-        
+
 
         // --- Механика рывка ---
         if ((Phaser.Input.Keyboard.JustDown(this.keys.dash) || Phaser.Input.Keyboard.JustDown(this.shiftButton)) && this.canDash && !this.isDashing) {
@@ -102,11 +94,11 @@ export class PlayerClass extends Scene {
                 this.canDash = false;
                 this.isDashing = true;
 
-                this.time.delayedCall(Const.DASH_COOLDOWN, () => {
+                this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => {
                     this.canDash = true;
                 });
 
-                this.time.delayedCall(Const.DASH_DURATION, () => {
+                this.scene.time.delayedCall(Const.DASH_DURATION, () => {
                     this.isDashing = false;
                     this.player.setVelocityX(0);
                 });
@@ -129,7 +121,7 @@ export class PlayerClass extends Scene {
             } else if (this.keys.left.isDown || this.keys.right.isDown) {
                 if (!this.isRunning) {
                     this.player.play('startrun', true)
-                    this.time.delayedCall(100, () => { // время, через которое начнётся бег // переход с начала бега в бег
+                    this.scene.time.delayedCall(100, () => { // время, через которое начнётся бег // переход с начала бега в бег
                         this.isRunning = true;
                     });
                 } else {
@@ -144,10 +136,13 @@ export class PlayerClass extends Scene {
         }
     }
 
-    // generateLevel() {
-    //     this.platforms.create(Const.WIDTH, Const.HEIGHT*2 - 20, 'ground').setScale(15, 1).refreshBody();
-    //     for (let i = 0; i < 15; i++) {
-    //         this.platforms.create(getRandomInt(0, Const.WIDTH*2), Const.HEIGHT*2/5*i, 'ground');
-    //     }
-    // }
+    getPlayer() {
+        return this.player;
+    }
+
+    setPlayerPosition(x, y) {
+        if (this.player) {
+            this.player.setPosition(x, y);
+        }
+    }
 }

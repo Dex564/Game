@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { WIDTH, HEIGHT } from '../const';
-import assets from '../assets.js'
+import assets from '../assets.js';
+import { createPlayerAnimations } from '../animations.js';
 
 export class Preloader extends Scene {
     constructor() {
@@ -29,6 +30,10 @@ export class Preloader extends Scene {
             const item = assets.spritesheet[key];
             this.load.spritesheet(item.key, item.args[0], item.args[1]);
         }
+
+        this.load.on('complete', () => {
+            createPlayerAnimations(this.anims);
+        });
     }
 
     create() {
