@@ -2,7 +2,7 @@ export default {
     'image': {
         backgroundImage: {
             key: 'background',
-            args: ['assets/bg.png']
+            args: ['assets/background.png']
         },
         button: {
             key: 'button',
@@ -19,14 +19,22 @@ export default {
         menubg : {
             key: 'menubg',
             args: ['assets/menu.png']
+        },
+        platform_horisontal: {
+            key: 'platform_horisontal',
+            args: ['assets/platform_horisontal.png']
+        },
+        platform_vertical: {
+            key: 'platform_vertical',
+            args: ['assets/platform_vertical.png']
         }
     },
     'spritesheet': {
         player: {
             key: 'person',
-            args: ['assets/player.png', {
-                frameWidth: 24,
-                frameHeight: 34
+            args: ['assets/Hero1.png', {
+                frameWidth: 41,
+                frameHeight: 64
             }]
         },
         dashing: {

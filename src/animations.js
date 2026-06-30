@@ -7,17 +7,25 @@ export function createPlayerAnimations(anims) {
     });
 
     anims.create({
+        key: 'startrun',
+        texture: 'person',
+        frames: anims.generateFrameNumbers('person', {start: 1, end:3}),
+        frameRate: 12,
+        duration: 1000
+    });
+
+    anims.create({
         key: 'run',
         texture: 'person',
-        frames: anims.generateFrameNumbers('person', {start: 2, end: 3}),
-        frameRate: 7,
+        frames: anims.generateFrameNumbers('person', [1, 2, 3, 4]),
+        frameRate: 12,
         repeat: -1
     });
 
     anims.create({
         key: 'jump',
         texture: 'person',
-        frames: anims.generateFrameNumbers('person', {start: 1, end: 1}),
+        frames: anims.generateFrameNumbers('person', {start: 4, end: 5}),
         frameRate: 1,
         repeat: -1
     });
@@ -28,4 +36,9 @@ export function createPlayerAnimations(anims) {
         frameRate: 24,
         repeat: -1
     });
+
+    // amims.create({
+    //     key: 'attack',
+
+    // })
 }

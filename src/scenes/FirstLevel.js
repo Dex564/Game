@@ -10,7 +10,7 @@ export class FirstLevel extends Scene {
     }
 
     create() {
-        this.add.image(Const.WIDTH/2, Const.HEIGHT/2, 'background');
+        this.add.image(0, 0, 'background').setOrigin(0);
 
         // --- Игрок ---
         this.player = this.physics.add.sprite(Const.WIDTH/2, Const.HEIGHT/2, 'person');
@@ -26,19 +26,37 @@ export class FirstLevel extends Scene {
             dash: 'q'
         });
         this.spaceButton = this.input.keyboard.addKey('space');
+        this.shiftButton = this.input.keyboard.addKey("SHIFT")
 
         this.canDash = true;
         this.isDashing = false;
+        this.isRunning = false;
 
-        // --- Уровень ---
+        // --- Генерация уровня ---
         this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(Const.WIDTH/2, Const.HEIGHT-50, 'ground').setScale(2).refreshBody();
-
-        this.physics.world.setBounds(0, 0, Const.WIDTH, Const.HEIGHT);
+        this.generateLevel();
         this.physics.add.collider(this.player, this.platforms);
-        for (let i = 0; i < 5; i++) {
-            this.platforms.create(getRandomInt(0, Const.WIDTH), Const.HEIGHT/5*i, 'ground');
-        }
+        
+        const spawnX = 960 / 2;
+        const spawnY = Const.HEIGHT * 2;
+        this.player.setPosition(spawnX, spawnY - 100);
+
+        // Границы мира
+        this.physics.world.setBounds(0, 0, Const.WIDTH * 2, Const.HEIGHT * 2 - 24);
+
+        // --- Камера ---
+        var camera = this.cameras.add(
+            0,
+            0,
+            Const.WIDTH,
+            Const.HEIGHT,
+            true,
+            'FirstLevelCam'
+        );
+        
+        camera.startFollow(this.player, false, 0.1, 1);
+        camera.setBounds(0, 0, Const.WIDTH*2, Const.HEIGHT*2, true);
+        camera.setZoom(1, 1);
     }
 
     update() {
@@ -73,7 +91,7 @@ export class FirstLevel extends Scene {
         
 
         // --- Механика рывка ---
-        if (Phaser.Input.Keyboard.JustDown(this.keys.dash) && this.canDash && !this.isDashing) {
+        if ((Phaser.Input.Keyboard.JustDown(this.keys.dash) || Phaser.Input.Keyboard.JustDown(this.shiftButton)) && this.canDash && !this.isDashing) {
             let dashX = 0;
             if (this.keys.right.isDown && !this.keys.left.isDown) {
                 dashX = Const.DASH_SPEED;
@@ -111,12 +129,26 @@ export class FirstLevel extends Scene {
                 this.player.play('idle', true);
                 return;
             } else if (this.keys.left.isDown || this.keys.right.isDown) {
-                this.player.play('run', true);
+                if (!this.isRunning) {
+                    this.player.play('startrun', true)
+                    this.time.delayedCall(150, () => { // время, через которое начнётся бег // переход с начала бега в бег
+                        this.isRunning = true;
+                    });
+                } else {
+                    this.player.play('run', true);
+                }
             } else {
                 this.player.play('idle', true);
             }
         } else {
             this.player.play('jump', true);
+        }
+    }
+
+    generateLevel() {
+        this.platforms.create(Const.WIDTH, Const.HEIGHT*2 - 20, 'ground').setScale(15, 1).refreshBody();
+        for (let i = 0; i < 15; i++) {
+            this.platforms.create(getRandomInt(0, Const.WIDTH*2), Const.HEIGHT*2/5*i, 'ground');
         }
     }
 }
