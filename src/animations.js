@@ -9,7 +9,7 @@ export function createPlayerAnimations(anims) {
     anims.create({
         key: 'startrun',
         texture: 'person',
-        frames: anims.generateFrameNumbers('person', {start: 1, end:3}),
+        frames: anims.generateFrameNumbers('person', {start: 1, end: 1}),
         frameRate: 12,
         duration: 1000
     });
@@ -17,7 +17,7 @@ export function createPlayerAnimations(anims) {
     anims.create({
         key: 'run',
         texture: 'person',
-        frames: anims.generateFrameNumbers('person', [1, 2, 3, 4]),
+        frames: anims.generateFrameNumbers('person', { frames: [ 2, 3, 2 ] }),
         frameRate: 12,
         repeat: -1
     });
@@ -32,7 +32,7 @@ export function createPlayerAnimations(anims) {
 
     anims.create({
         key: 'dash',
-        frames: anims.generateFrameNumbers('dash', [1, 0, 2]), // [1, 0, 2] - порядок анимации
+        frames: anims.generateFrameNumbers('person', { frames: [ 2 ] }), // [1, 0, 2] - порядок анимации
         frameRate: 24,
         repeat: -1
     });

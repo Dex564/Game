@@ -20,7 +20,7 @@ export class MainMenu extends Scene {
     
     startGame() {
         this.scene.transition({
-            target: 'FirstLevel',
+            target: 'Lobby',
             duration: 1000,
             moveBelow: true,
             onUpdate: (progress) => {

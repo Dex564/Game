@@ -1,5 +1,5 @@
 import { Boot } from './scenes/Boot';
-import { FirstLevel } from './scenes/FirstLevel';
+import { Lobby } from './scenes/Lobby';
 import { Game } from 'phaser';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
@@ -27,7 +27,7 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
-        FirstLevel
+        Lobby
     ]
 };
 

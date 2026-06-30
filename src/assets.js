@@ -2,7 +2,7 @@ export default {
     'image': {
         backgroundImage: {
             key: 'background',
-            args: ['assets/background.png']
+            args: ['assets/bg.png']
         },
         button: {
             key: 'button',
