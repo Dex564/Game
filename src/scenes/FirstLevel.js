@@ -31,6 +31,10 @@ export class FirstLevel extends Scene {
         this.canDash = true;
         this.isDashing = false;
         this.isRunning = false;
+        this.isFalling = false;
+        this.canControl = true;
+        this.canJumpRight = true;
+        this.canJumpLeft = true;
 
         // --- Генерация уровня ---
         this.platforms = this.physics.add.staticGroup();
@@ -53,39 +57,92 @@ export class FirstLevel extends Scene {
             true,
             'FirstLevelCam'
         );
+<<<<<<< Updated upstream:src/scenes/FirstLevel.js
         
         camera.startFollow(this.player, false, 0.1, 1);
         camera.setBounds(0, 0, Const.WIDTH*2, Const.HEIGHT*2, true);
         camera.setZoom(1, 1);
+=======
+
+        camera.startFollow(this.player, true, 0.1, 1);
+        camera.setBounds(0, 0, this.worldX, this.worldY, true);
+        let cameraZoom = 2;
+        camera.setZoom(cameraZoom, cameraZoom);
+>>>>>>> Stashed changes:src/scenes/PlayerClass.js
     }
 
     update() {
 
         // --- Управление ---
         if (!this.isDashing) {
-            if (this.keys.left.isDown && !this.keys.right.isDown) {
+            if (this.keys.left.isDown && !this.keys.right.isDown && this.canControl) {
                 if (!this.player.body.touching.down) {
                     this.player.setVelocityX(-500);
+                } else {
+                    this.player.setVelocityX(-400);
                 }
-                else this.player.setVelocityX(-400);
                 this.player.setFlipX(true);
-
             }
-            else if (this.keys.right.isDown && !this.keys.left.isDown) {
+            else if (this.keys.right.isDown && !this.keys.left.isDown && this.canControl) {
                 if (!this.player.body.touching.down) {
                     this.player.setVelocityX(500);
+                } else {
+                    this.player.setVelocityX(400);
                 }
-                else this.player.setVelocityX(400);
                 this.player.setFlipX(false);
             }
             else {
-                this.player.setVelocityX(0);
+                if (this.canControl) {
+                    this.player.setVelocityX(0);
+                }
+            }
+
+            // Вернуть возможность ходить после прыжка
+            if (this.player.body.touching.down) {
+                this.canJumpLeft = true;
+                this.canJumpRight = true;
             }
 
             if ((this.keys.up.isDown || this.spaceButton.isDown) && this.player.body.touching.down) {
-                this.player.setVelocityY(-700);
+                this.player.setVelocityY(-500);
             }
 
+            if (this.player.body.velocity.y > 0) {
+                this.player.isFalling = true;
+            } else {
+                this.player.isFalling = false;
+            }
+
+            // Прыжок от стены
+            if (!this.player.body.touching.down && this.canControl) {
+                const wantJump = this.keys.up.isDown || this.spaceButton.isDown;
+                
+                if (wantJump) {
+                    if ((this.player.body.touching.left || this.player.body.blocked.left) && this.canJumpRight) {
+                        this.player.x += 6;
+                        this.player.setVelocityX(300);
+                        this.player.setVelocityY(-600);
+                        this.player.setFlipX(false);
+                        this.canControl = false;
+                        this.canJumpRight = false;
+
+                        this.scene.time.delayedCall(500, () => {this.canControl = true});
+                        this.scene.time.delayedCall(1180, () => {this.canJumpRight = true});
+                    } 
+                    else if ((this.player.body.touching.right || this.player.body.blocked.right) && this.canJumpLeft) {
+                        this.player.x -= 6;
+                        this.player.setVelocityX(-300);
+                        this.player.setVelocityY(-600);
+                        this.player.setFlipX(true);
+                        this.canControl = false;
+                        this.canJumpLeft = false;
+                        
+                        this.scene.time.delayedCall(500, () => {this.canControl = true});
+                        this.scene.time.delayedCall(1180, () => {this.canJumpLeft = true});
+                    }
+                }
+            }
+            
             this.updateAnimation();
         }
         

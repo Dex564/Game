@@ -33,8 +33,8 @@ export default {
         player: {
             key: 'person',
             args: ['assets/Hero1.png', {
-                frameWidth: 41,
-                frameHeight: 64
+                frameWidth: 52,
+                frameHeight: 72
             }]
         },
         dashing: {
