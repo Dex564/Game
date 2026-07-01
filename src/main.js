@@ -1,7 +1,8 @@
 import { Boot } from './scenes/Boot';
-import { FirstLevel } from './scenes/FirstLevel';
+import { Lobby } from './scenes/Lobby';
 import { Game } from 'phaser';
 import { MainMenu } from './scenes/MainMenu';
+import { CaveLevel } from './scenes/CaveLevel';
 import { Preloader } from './scenes/Preloader';
 import * as Phaser from 'phaser';
 import { WIDTH, HEIGHT } from './const';
@@ -20,14 +21,15 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 1000 }
+            gravity: { y: 980 }
         }
     },
     scene: [
         Boot,
         Preloader,
         MainMenu,
-        FirstLevel
+        Lobby,
+        CaveLevel
     ]
 };
 

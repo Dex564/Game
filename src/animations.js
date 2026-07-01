@@ -32,7 +32,7 @@ export function createPlayerAnimations(anims) {
 
     anims.create({
         key: 'dash',
-        frames: anims.generateFrameNumbers('dash', [1, 0, 2]), // [1, 0, 2] - порядок анимации
+        frames: anims.generateFrameNumbers('person', [6]), // [1, 0, 2] - порядок анимации
         frameRate: 24,
         repeat: -1
     });

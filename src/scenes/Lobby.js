@@ -20,7 +20,6 @@ export class Lobby extends Scene {
         this.platforms = this.physics.add.staticGroup();
         this.physics.add.collider(this.player, this.platforms);
         this.platforms.create(WIDTH/2, HEIGHT - 25, 'ground').setScale(2, 1).refreshBody();
-        this.platforms.create(WIDTH/2 + 200, HEIGHT-400, 'platform_vertical').setScale(3, 10).refreshBody();
 
         this.spawnCaveEntry(WIDTH/2-500, HEIGHT-50);
     }
