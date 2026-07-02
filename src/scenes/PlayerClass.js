@@ -24,64 +24,117 @@ export class PlayerClass {
             dash: 'q'
         });
         this.spaceButton = this.scene.input.keyboard.addKey('space');
-        this.shiftButton = this.scene.input.keyboard.addKey("SHIFT")
+        this.shiftButton = this.scene.input.keyboard.addKey("SHIFT");
 
         this.canDash = true;
         this.isDashing = false;
         this.isRunning = false;
+        this.isFalling = false;
+        this.canControl = true;
+        this.canJumpRight = true;
+        this.canJumpLeft = true;
 
         this.createCamera();
         return this.player;
     }
 
     createCamera() {
-        // --- Камера ---
-        const camera = this.scene.cameras.add(
-            0,
-            0,
-            this.worldX,
-            this.worldY,
-            true
-        );
-
+        const camera = this.scene.cameras.add(0, 0, this.worldX, this.worldY, true);
         camera.startFollow(this.player, true, 0.1, 1);
         camera.setBounds(0, 0, this.worldX, this.worldY, true);
-        camera.setZoom(2, 2);
+        let cameraZoom = 2;
+        camera.setZoom(cameraZoom, cameraZoom);
     }
 
     updatePlayer() {
-
         // --- Управление ---
         if (!this.isDashing) {
-            if (this.keys.left.isDown && !this.keys.right.isDown) {
+            // Влево
+            if (this.keys.left.isDown && !this.keys.right.isDown && this.canControl) {
                 if (!this.player.body.touching.down) {
                     this.player.setVelocityX(-500);
+                } else {
+                    this.player.setVelocityX(-400);
                 }
-                else this.player.setVelocityX(-400);
                 this.player.setFlipX(true);
-
             }
-            else if (this.keys.right.isDown && !this.keys.left.isDown) {
+            // Вправо
+            else if (this.keys.right.isDown && !this.keys.left.isDown && this.canControl) {
                 if (!this.player.body.touching.down) {
                     this.player.setVelocityX(500);
+                } else {
+                    this.player.setVelocityX(400);
                 }
-                else this.player.setVelocityX(400);
                 this.player.setFlipX(false);
             }
+            // Нет движения или управление заблокировано
             else {
-                this.player.setVelocityX(0);
+                if (this.canControl) {
+                    this.player.setVelocityX(0);
+                }
             }
 
+            // Прыжок с земли
             if ((this.keys.up.isDown || this.spaceButton.isDown) && this.player.body.touching.down) {
-                this.player.setVelocityY(-700);
+                this.player.setVelocityY(-500);
+            }
+
+            // Состояние падения
+            if (this.player.body.velocity.y > 0) {
+                this.player.isFalling = true;
+            } else {
+                this.player.isFalling = false;
+            }
+
+            // --- Отскок от стены ---
+            if (!this.player.body.touching.down && this.canControl) {
+                const wantJump = this.keys.up.isDown || this.spaceButton.isDown;
+
+                if (wantJump) {
+                    if ((this.player.body.touching.left || this.player.body.blocked.left) && this.canJumpLeft) {
+                        this.player.x += 6;                       
+                        this.player.setVelocityX(300);
+                        this.player.setVelocityY(-600);
+                        this.player.setFlipX(false);
+                        this.canControl = false;
+                        this.canJumpLeft = false;
+
+                        this.scene.time.delayedCall(500, () => {
+                            this.player.setVelocityX(0);
+                            this.canControl = true;
+                        });
+                        this.scene.time.delayedCall(1180, () => this.canJumpLeft = true);
+                    }
+                    
+                    else if ((this.player.body.touching.right || this.player.body.blocked.right) && this.canJumpRight) {
+                        this.player.x -= 6;
+                        this.player.setVelocityX(-300);
+                        this.player.setVelocityY(-600);
+                        this.player.setFlipX(true);
+                        this.canControl = false;
+                        this.canJumpRight = false;
+
+                        this.scene.time.delayedCall(500, () => {
+                            this.player.setVelocityX(0);
+                            this.canControl = true;
+                        });
+                        this.scene.time.delayedCall(1180, () => this.canJumpRight = true);
+                    }
+                }
+            }
+
+            if (this.player.body.touching.down) {
+                this.canWallJump = true;
+                this.canJumpLeft = true;
+                this.canJumpRight = true;
             }
 
             this.updateAnimation();
         }
 
-
-        // --- Механика рывка ---
-        if ((Phaser.Input.Keyboard.JustDown(this.keys.dash) || Phaser.Input.Keyboard.JustDown(this.shiftButton)) && this.canDash && !this.isDashing) {
+        // --- Механика рывка (dash) ---
+        if ((Phaser.Input.Keyboard.JustDown(this.keys.dash) || Phaser.Input.Keyboard.JustDown(this.shiftButton))
+            && this.canDash && !this.isDashing) {
             let dashX = 0;
             if (this.keys.right.isDown && !this.keys.left.isDown) {
                 dashX = Const.DASH_SPEED;
@@ -120,8 +173,8 @@ export class PlayerClass {
                 return;
             } else if (this.keys.left.isDown || this.keys.right.isDown) {
                 if (!this.isRunning) {
-                    this.player.play('startrun', true)
-                    this.scene.time.delayedCall(100, () => { // время, через которое начнётся бег // переход с начала бега в бег
+                    this.player.play('startrun', true);
+                    this.scene.time.delayedCall(100, () => {
                         this.isRunning = true;
                     });
                 } else {

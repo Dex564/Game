@@ -30,19 +30,15 @@ export default {
         },
         cave_entry: {
             key: 'cave_entry',
-            args: ['assets/cave_entry.png']
-        },
-        tile: {
-            key: 'tile',
-            args: ['assets/tile.png']
+            args: ['assets/Temple1.png']
         }
     },
     'spritesheet': {
         player: {
             key: 'person',
             args: ['assets/Hero1.png', {
-                frameWidth: 41,
-                frameHeight: 64
+                frameWidth: 52,
+                frameHeight: 72
             }]
         },
         dashing: {
