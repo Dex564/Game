@@ -2,7 +2,7 @@ export default {
     'image': {
         backgroundImage: {
             key: 'background',
-            args: ['assets/bg.png']
+            args: ['assets/bg.png'] // args: ['assets/bg.png']
         },
         button: {
             key: 'button',
@@ -45,15 +45,22 @@ export default {
         player: {
             key: 'person',
             args: ['assets/Hero1.png', {
-                frameWidth: 52,
-                frameHeight: 72
+                frameWidth: 45,
+                frameHeight: 64
             }]
         },
-        dashing: {
+        playerDash: {
             key: 'dash',
             args: ['assets/dashing.png', {
                 frameWidth: 32,
                 frameHeight: 34
+            }]
+        },
+        playerAttack: {
+            key: 'attack',
+            args: ['assets/Hero1Attack.png', {
+                frameWidth: 52,
+                frameHeight: 72
             }]
         }
     }
