@@ -35,6 +35,10 @@ export default {
         tile: {
             key: 'tile',
             args: ['assets/tile.png']
+        },
+        bgcave: {
+            key: 'bgcave',
+            args: ['assets/bgcave.png']
         }
     },
     'spritesheet': {

@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { WIDTH, HEIGHT, chunks, paths } from '../const';
 import { PlayerClass } from "./PlayerClass";
 
-const TILE_SIZE = 128;
+const TILE_SIZE = 64;
 const CHUNK_SIZE = 4;
 const CHUNKS_X = 25;
 const CHUNKS_Y = 15;
@@ -13,11 +13,12 @@ export class CaveLevel extends Scene {
     }
     
     create() {
-        this.add.image(0, 0, 'background').setOrigin(0);
+        this.add.image(0, 0, 'bgcave').setOrigin(0);
         
-        this.playerHandler = new PlayerClass(this, CHUNKS_X*CHUNK_SIZE*TILE_SIZE, CHUNKS_Y*CHUNK_SIZE*TILE_SIZE);
+        this.playerHandler = new PlayerClass(this, CHUNKS_X*TILE_SIZE*CHUNK_SIZE, CHUNKS_Y*TILE_SIZE*CHUNK_SIZE);
         this.player = this.playerHandler.createPlayer();
-        this.playerHandler.setPlayerPosition(WIDTH/2, HEIGHT/2 - 200);
+        this.playerHandler.setPlayerPosition(100, 100);
+        this.physics.world.setBounds(0, 0, CHUNKS_X*TILE_SIZE*CHUNK_SIZE, CHUNKS_Y*TILE_SIZE*CHUNK_SIZE);
         
         this.cameras.main.fadeIn(500, 0, 0, 0);
         const layout = this.generateLayout();
@@ -32,11 +33,9 @@ export class CaveLevel extends Scene {
     
     generateLayout() {
         const layout = [];
-        const maxX = 30;
-        const maxY = 16;
-        for (let y = 0; y < maxY; y++) {
+        for (let y = 0; y < CHUNKS_Y; y++) {
             const layer = [];
-            for (let x = 0; x < maxX; x++) {
+            for (let x = 0; x < CHUNKS_X; x++) {
                 // left, right, up, down
                 const can = [1, 1, 1, 1];
                 
@@ -48,9 +47,9 @@ export class CaveLevel extends Scene {
                 }
                 
                 if (x == 0) can[0] = 0;
-                if (x == maxX-1) can[1] = 0;
+                if (x == CHUNKS_X-1) can[1] = 0;
                 if (y == 0) can[2] = 0;
-                if (y == maxY-1) can[3] = 0;
+                if (y == CHUNKS_Y-1) can[3] = 0;
                 let possible = new Set();
                 if (can[0] && can[2]) {
                     possible = paths[0].intersection(paths[2]);
@@ -63,15 +62,12 @@ export class CaveLevel extends Scene {
                     let rightdown = paths[1].union(paths[3]);
                     possible = rightdown.difference(leftup);
                 }
-                // if (can[0]) paths[0].forEach((value) => possible.push(value));
-                // if (can[1]) paths[1].forEach((value) => possible.push(value));
-                // if (can[2]) paths[2].forEach((value) => possible.push(value));
-                // if (can[3]) paths[3].forEach((value) => possible.push(value));
-                // if (!can[0]) possible = possible.filter(item => !paths[0].includes(item));
-                // if (!can[1]) possible = possible.filter(item => !paths[1].includes(item));
-                // if (!can[2]) possible = possible.filter(item => !paths[2].includes(item));
-                // if (!can[3]) possible = possible.filter(item => !paths[3].includes(item));
-                // console.log(can, possible);
+                if (!can[1]) {
+                    possible = possible.difference(paths[1]);
+                }
+                if (!can[3]) {
+                    possible = possible.difference(paths[3]);
+                }
                 possible = [...possible];
                 if (possible.length) {
                     const randomIndex = Math.floor(Math.random() * possible.length);

@@ -21,38 +21,51 @@ export class PlayerClass {
             down: 's',
             left: 'a',
             right: 'd',
-            dash: 'q'
+            dash: 'q',
+            attack: 'l'
         });
         this.spaceButton = this.scene.input.keyboard.addKey('space');
         this.shiftButton = this.scene.input.keyboard.addKey("SHIFT");
 
+        // Лкм на атаку
+        this.attackButtonPressed = false;
+        this.scene.input.on('pointerdown', (pointer) => {
+            if (pointer.leftButtonDown()) {
+                this.attackButtonPressed = true;
+                this.scene.time.delayedCall(Const.ATTACK_DURATION, () => this.attackButtonPressed = false)
+            }
+        });
+
         this.canDash = true;
         this.isDashing = false;
         this.isRunning = false;
-        this.isFalling = false;
+
+        this.inAir = false;
         this.canControl = true;
+
         this.canJumpRight = true;
         this.canJumpLeft = true;
+
+        this.isAttacking = false;
 
         this.createCamera();
         return this.player;
     }
 
     createCamera() {
-        // console.log(this.worldX, this.worldY);
-        // const camera = this.scene.cameras.add(0, 0, this.worldX, this.worldY, true);
-        // camera.startFollow(this.player, true, 0.1, 1);
-        // camera.setBounds(0, 0, this.worldX, this.worldY, true);
-        // let cameraZoom = 2;
-        // camera.setZoom(cameraZoom, cameraZoom);
+        const camera = this.scene.cameras.add(0, 0, Const.WIDTH, Const.HEIGHT, true);
+        camera.startFollow(this.player, true, 0.1, 1);
+        camera.setBounds(0, 0, this.worldX, this.worldY, true);
+        let cameraZoom = 2;
+        camera.setZoom(cameraZoom, cameraZoom);
     }
 
     updatePlayer() {
         // --- Управление ---
-        if (!this.isDashing) {
+        if (!this.isDashing && this.canControl) {
             // Влево
             if (this.keys.left.isDown && !this.keys.right.isDown && this.canControl) {
-                if (!this.player.body.touching.down) {
+                if (!this.player.body.blocked.down) {
                     this.player.setVelocityX(-500);
                 } else {
                     this.player.setVelocityX(-400);
@@ -61,7 +74,7 @@ export class PlayerClass {
             }
             // Вправо
             else if (this.keys.right.isDown && !this.keys.left.isDown && this.canControl) {
-                if (!this.player.body.touching.down) {
+                if (!this.player.body.blocked.down) {
                     this.player.setVelocityX(500);
                 } else {
                     this.player.setVelocityX(400);
@@ -76,50 +89,30 @@ export class PlayerClass {
             }
 
             // Прыжок с земли
-            if ((this.keys.up.isDown || this.spaceButton.isDown) && !this.player.inAir) {
+            if ((this.keys.up.isDown || this.spaceButton.isDown) && this.player.body.blocked.down) {
                 this.player.setVelocityY(-500);
             }
 
             // Состояние падения
-            if (this.player.body.velocity.y != 0) {
-                this.player.inAir = true;
+            if (this.player.body.velocity.y != 0 && !this.player.body.blocked.down && !this.player.body.blocked.up) {
+                this.inAir = true;
             } else {
-                this.player.inAir = false;
+                this.inAir = false;
             }
 
-
-            // Состояние падения
-            if (this.player.body.velocity.y > 0) {
-                this.player.isFalling = true;
-            } else {
-                this.player.isFalling = false;
-            }
-
-            // --- Отскок от стены ---
-            if (!this.player.body.touching.down && this.canControl) {
+            // --- Взаимодействие со стеной ---
+            if (!this.player.body.blocked.down && this.canControl) {
                 const wantJump = this.keys.up.isDown || this.spaceButton.isDown;
-
+                const touchingLeft = this.player.body.touching.left || this.player.body.blocked.left;
+                const touchingRight = this.player.body.touching.right || this.player.body.blocked.right;
+                
+                // --- Отскок от стены ---
                 if (wantJump) {
-                    if ((this.player.body.touching.left || this.player.body.blocked.left) && this.canJumpLeft) {
+                    if (touchingLeft && this.canJumpRight) {
                         this.player.x += 6;                       
                         this.player.setVelocityX(300);
                         this.player.setVelocityY(-600);
                         this.player.setFlipX(false);
-                        this.canControl = false;
-                        this.canJumpLeft = false;
-
-                        this.scene.time.delayedCall(500, () => {
-                            this.player.setVelocityX(0);
-                            this.canControl = true;
-                        });
-                        this.scene.time.delayedCall(1180, () => this.canJumpLeft = true);
-                    }
-                    
-                    else if ((this.player.body.touching.right || this.player.body.blocked.right) && this.canJumpRight) {
-                        this.player.x -= 6;
-                        this.player.setVelocityX(-300);
-                        this.player.setVelocityY(-600);
-                        this.player.setFlipX(true);
                         this.canControl = false;
                         this.canJumpRight = false;
 
@@ -129,10 +122,35 @@ export class PlayerClass {
                         });
                         this.scene.time.delayedCall(1180, () => this.canJumpRight = true);
                     }
+                    
+                    else if (touchingRight && this.canJumpLeft) {
+                        this.player.x -= 6;
+                        this.player.setVelocityX(-300);
+                        this.player.setVelocityY(-600);
+                        this.player.setFlipX(true);
+                        this.canControl = false;
+                        this.canJumpLeft = false;
+
+                        this.scene.time.delayedCall(500, () => {
+                            this.player.setVelocityX(0);
+                            this.canControl = true;
+                        });
+                        this.scene.time.delayedCall(1180, () => this.canJumpLeft = true);
+                    }
+                }
+
+                // --- Скольжение по стене ---
+                const moveTowardsWall = (touchingLeft && this.keys.left.isDown) || (touchingRight && this.keys.right.isDown);
+                if (moveTowardsWall && !wantJump) {
+                    this.player.body.allowGravity = false;
+                    this.player.setVelocityY(Const.WALL_SLIDE_SPEED);
+                    // this.player.play('wallslide', true);
+                } else {
+                    this.player.body.allowGravity = true;
                 }
             }
 
-            if (this.player.body.touching.down) {
+            if (this.player.body.blocked.down) {
                 this.canWallJump = true;
                 this.canJumpLeft = true;
                 this.canJumpRight = true;
@@ -142,8 +160,7 @@ export class PlayerClass {
         }
 
         // --- Механика рывка (dash) ---
-        if ((Phaser.Input.Keyboard.JustDown(this.keys.dash) || Phaser.Input.Keyboard.JustDown(this.shiftButton))
-            && this.canDash && !this.isDashing) {
+        if ((Phaser.Input.Keyboard.JustDown(this.keys.dash) || Phaser.Input.Keyboard.JustDown(this.shiftButton)) && this.canDash && !this.isDashing && !this.isAttacking) {
             let dashX = 0;
             if (this.keys.right.isDown && !this.keys.left.isDown) {
                 dashX = Const.DASH_SPEED;
@@ -167,6 +184,23 @@ export class PlayerClass {
             }
             this.updateAnimation();
         }
+
+        // --- Атака ---
+        if (!this.isDashing && !this.isAttacking && this.player.body.blocked.down) {
+            if (Phaser.Input.Keyboard.JustDown(this.keys.attack) || this.attackButtonPressed) {
+                this.isAttacking = true;
+                this.canControl = false;
+                this.canDash = false;
+                this.player.body.y -= 10;
+                this.player.setVelocityX(0);
+                this.scene.time.delayedCall(Const.ATTACK_DURATION, () => {
+                    this.isAttacking = false;
+                    this.canControl = true;
+                    this.canDash = true;
+                });
+            }
+            this.updateAnimation();
+        }
     }
 
     updateAnimation() {
@@ -175,15 +209,20 @@ export class PlayerClass {
             return;
         }
 
-        if (this.player.body.touching.down) {
+        if (this.isAttacking) {
+            this.player.play('attack', true);
+            return;
+        }
+
+        if (this.player.body.blocked.down) {
             // на земле
             if (this.keys.left.isDown && this.keys.right.isDown) {
                 this.player.play('idle', true);
                 return;
             } else if (this.keys.left.isDown || this.keys.right.isDown) {
                 if (!this.isRunning) {
-                    this.player.play('startrun', true);
-                    this.scene.time.delayedCall(100, () => {
+                    this.player.play('startrun', true)
+                    this.scene.time.delayedCall(100, () => { // время, через которое начнётся бег // переход с начала бега в бег
                         this.isRunning = true;
                     });
                 } else {
