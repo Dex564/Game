@@ -39,8 +39,9 @@ export function createPlayerAnimations(anims) {
 
     anims.create({
         key: 'attack',
-        frames: anims.generateFrameNumbers('person', { frames: [ 9, ] }),
-        frameRate: 24,
+        frames: anims.generateFrameNumbers('attack', {start: 0, end: 2}),
+        frameRate: 12,
+        // duration: 200,
         repeat: -1
     })
 }
