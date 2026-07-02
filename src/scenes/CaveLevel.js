@@ -17,7 +17,7 @@ export class CaveLevel extends Scene {
         
         this.playerHandler = new PlayerClass(this, CHUNKS_X*TILE_SIZE*CHUNK_SIZE, CHUNKS_Y*TILE_SIZE*CHUNK_SIZE);
         this.player = this.playerHandler.createPlayer();
-        this.playerHandler.setPlayerPosition(100, 100);
+        this.playerHandler.setPlayerPosition(200, 200);
         this.physics.world.setBounds(0, 0, CHUNKS_X*TILE_SIZE*CHUNK_SIZE, CHUNKS_Y*TILE_SIZE*CHUNK_SIZE);
         
         this.cameras.main.fadeIn(500, 0, 0, 0);
@@ -85,13 +85,13 @@ export class CaveLevel extends Scene {
     
     drawRoom(layout) {
         this.map = this.make.tilemap({
-            tileWidth: TILE_SIZE,
+            tileWidth: TILE_SIZE+TILE_SIZE,
             tileHeight: TILE_SIZE,
             width: CHUNKS_X * CHUNK_SIZE,
             height: CHUNKS_Y * CHUNK_SIZE
         });
         
-        const tileset = this.map.addTilesetImage('wall', 'tile', TILE_SIZE, TILE_SIZE);
+        const tileset = this.map.addTilesetImage('wall', 'tile');
         this.layer = this.map.createBlankLayer('level', tileset);
         
         for (let chunkY = 0; chunkY < CHUNKS_Y; chunkY++) {
