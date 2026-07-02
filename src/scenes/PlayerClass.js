@@ -221,8 +221,8 @@ export class PlayerClass {
                 return;
             } else if (this.keys.left.isDown || this.keys.right.isDown) {
                 if (!this.isRunning) {
-                    this.player.play('startrun', true);
-                    this.scene.time.delayedCall(100, () => {
+                    this.player.play('startrun', true)
+                    this.scene.time.delayedCall(100, () => { // время, через которое начнётся бег // переход с начала бега в бег
                         this.isRunning = true;
                     });
                 } else {
