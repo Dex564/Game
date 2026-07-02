@@ -31,6 +31,10 @@ export default {
         cave_entry: {
             key: 'cave_entry',
             args: ['assets/cave_entry.png']
+        },
+        tile: {
+            key: 'tile',
+            args: ['assets/tile.png']
         }
     },
     'spritesheet': {
