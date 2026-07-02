@@ -39,11 +39,12 @@ export class PlayerClass {
     }
 
     createCamera() {
-        const camera = this.scene.cameras.add(0, 0, this.worldX, this.worldY, true);
-        camera.startFollow(this.player, true, 0.1, 1);
-        camera.setBounds(0, 0, this.worldX, this.worldY, true);
-        let cameraZoom = 2;
-        camera.setZoom(cameraZoom, cameraZoom);
+        // console.log(this.worldX, this.worldY);
+        // const camera = this.scene.cameras.add(0, 0, this.worldX, this.worldY, true);
+        // camera.startFollow(this.player, true, 0.1, 1);
+        // camera.setBounds(0, 0, this.worldX, this.worldY, true);
+        // let cameraZoom = 2;
+        // camera.setZoom(cameraZoom, cameraZoom);
     }
 
     updatePlayer() {
@@ -75,9 +76,17 @@ export class PlayerClass {
             }
 
             // Прыжок с земли
-            if ((this.keys.up.isDown || this.spaceButton.isDown) && this.player.body.touching.down) {
+            if ((this.keys.up.isDown || this.spaceButton.isDown) && !this.player.inAir) {
                 this.player.setVelocityY(-500);
             }
+
+            // Состояние падения
+            if (this.player.body.velocity.y != 0) {
+                this.player.inAir = true;
+            } else {
+                this.player.inAir = false;
+            }
+
 
             // Состояние падения
             if (this.player.body.velocity.y > 0) {
