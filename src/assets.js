@@ -59,7 +59,7 @@ export default {
         playerAttack: {
             key: 'attack',
             args: ['assets/Hero1Attack.png', {
-                frameWidth: 52,
+                frameWidth: 50,
                 frameHeight: 72
             }]
         }

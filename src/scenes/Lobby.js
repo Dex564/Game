@@ -1,4 +1,4 @@
-import { PlayerClass } from "./PlayerClass";
+import { PlayerClass } from "../sprites/PlayerClass";
 import { WIDTH, HEIGHT } from '../const';
 import { Scene } from "phaser";
 

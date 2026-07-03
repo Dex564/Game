@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { WIDTH, HEIGHT, chunks, paths } from '../const';
-import { PlayerClass } from "./PlayerClass";
+import { PlayerClass } from "../sprites/PlayerClass";
 
 const TILE_SIZE = 64;
 const CHUNK_SIZE = 4;

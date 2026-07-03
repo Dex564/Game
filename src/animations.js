@@ -17,7 +17,7 @@ export function createPlayerAnimations(anims) {
     anims.create({
         key: 'run',
         texture: 'person',
-        frames: anims.generateFrameNumbers('person', { frames: [1, 2, 3, 4, 5, 4, 3, 2, 1] }),
+        frames: anims.generateFrameNumbers('person', { frames: [2, 3, 4, 5] }),
         frameRate: 3,
         repeat: -1
     });
@@ -25,8 +25,16 @@ export function createPlayerAnimations(anims) {
     anims.create({
         key: 'jump',
         texture: 'person',
-        frames: anims.generateFrameNumbers('person', {start: 6, end: 7}),
-        frameRate: 0.6,
+        frames: anims.generateFrameNumbers('person', {start: 6, end: 6}),
+        frameRate: 1,
+        repeat: -1
+    });
+
+    anims.create({
+        key: 'fall',
+        texture: 'person',
+        frames: anims.generateFrameNumbers('person', {start: 7, end: 7}),
+        frameRate: 1,
         repeat: -1
     });
 
