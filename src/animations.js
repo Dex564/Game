@@ -1,7 +1,7 @@
 export function createPlayerAnimations(anims) {
     anims.create({
         key: 'idle',
-        frames: anims.generateFrameNumbers('spearAttack', { start: 0, end: 0 }),
+        frames: anims.generateFrameNumbers('person', { start: 0, end: 0 }),
         frameRate: 11,
         repeat: -1
     });

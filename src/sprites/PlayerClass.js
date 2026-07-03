@@ -87,6 +87,9 @@ export class PlayerClass {
        ОСНОВНОЙ ЦИКЛ ОБНОВЛЕНИЯ
     ---------------------------------------------------------------- */
     updatePlayer() {
+        if (this.isFalling) {
+            console.log('falling')
+        }
         this.updateFallState();
         this.handleMovement();
         this.handleWallInteraction();
@@ -107,8 +110,7 @@ export class PlayerClass {
 
         const left = this.keys.left.isDown;
         const right = this.keys.right.isDown;
-        const jump = Phaser.Input.Keyboard.JustDown(this.jumpKey1) ||
-                     Phaser.Input.Keyboard.JustDown(this.jumpKey2);
+        const jump = this.jumpKey1.isDown || this.jumpKey2.isDown;
         const onGround = this.player.body.blocked.down;
 
         // Горизонтальное движение

@@ -12,7 +12,7 @@ export class Lobby extends Scene {
         this.playerHandler = new PlayerClass(this);
         this.player = this.playerHandler.createPlayer();
 
-        this.playerHandler.setPlayerPosition(WIDTH/2, HEIGHT/2 - 200);
+        this.playerHandler.setPlayerPosition(WIDTH/2-300, HEIGHT - 100);
 
         // Границы мира
         this.physics.world.setBounds(0, 0, WIDTH, HEIGHT - 24);
@@ -22,7 +22,7 @@ export class Lobby extends Scene {
         this.platforms.create(WIDTH/2, HEIGHT - 25, 'ground').setScale(2, 1).refreshBody();
 
         this.spawnCaveEntry(WIDTH/2-500, HEIGHT-50);
-        
+
         this.entering = false;
     }
 
