@@ -28,8 +28,8 @@ export default {
             key: 'platform_vertical',
             args: ['assets/platform_vertical.png']
         },
-        cave_entry: {
-            key: 'cave_entry',
+        main_temple: {
+            key: 'mainTemple',
             args: ['assets/Temple1.png']
         },
         tile: {
@@ -60,11 +60,11 @@ export default {
                 frameHeight: 34
             }]
         },
-        playerAttack: {
-            key: 'attack',
-            args: ['assets/Hero1Attack.png', {
-                frameWidth: 52,
-                frameHeight: 72
+        hero_spear_attack: {
+            key: 'spearAttack',
+            args: ['assets/HeroSpearAttack.png', {
+                frameWidth: 158,
+                frameHeight: 64
             }]
         }
     }

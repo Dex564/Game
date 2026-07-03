@@ -1,4 +1,4 @@
-import { PlayerClass } from "./PlayerClass";
+import { PlayerClass } from "../sprites/PlayerClass";
 import { WIDTH, HEIGHT } from '../const';
 import { Scene } from "phaser";
 
@@ -22,26 +22,45 @@ export class Lobby extends Scene {
         this.platforms.create(WIDTH/2, HEIGHT - 25, 'ground').setScale(2, 1).refreshBody();
 
         this.spawnCaveEntry(WIDTH/2-500, HEIGHT-50);
+
+        this.eKey = this.input.keyboard.addKey('E');
     }
 
     update() {
         this.playerHandler.updatePlayer();
+
+        const playerBounds = this.player.getBounds();
+        const zoneBounds = this.doorZone.getBounds();
+        const playerNearDoor = Phaser.Geom.Intersects.RectangleToRectangle(
+            playerBounds, zoneBounds
+        );
+
+        this.doorHint.setVisible(playerNearDoor);
+        if (playerNearDoor) {
+            this.doorHint.setPosition(this.doorZone.x, this.doorZone.y - 79);
+        }
+
+        if (playerNearDoor && Phaser.Input.Keyboard.JustDown(this.eKey)) {
+            this.enterCave();
+        }
     }
 
     spawnCaveEntry(x, y) {
-        this.cave = this.physics.add.staticGroup();
-        this.cave.create(x, y, 'cave_entry').setOrigin(1).refreshBody();
-        this.entering = false;
-        this.physics.add.overlap(
-            this.player,
-            this.cave,
-            () => {this.enterCave()}
-        );
+        this.temple = this.add.image(x, y, 'mainTemple').setOrigin(1, 1);
+        this.doorZone = this.add.zone(x-100, y-14, 36, 63).setOrigin(0.5, 0.5);
+        this.doorHint = this.add.text(0, 0, '[E]', {
+            fontSize: '20px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            backgroundColor: '#000000',
+            padding: { left: 8, right: 8, top: 4, bottom: 4 }
+        }).setOrigin(0.5).setVisible(false).setAlpha(0.7);
     }
 
     enterCave() {
         if (this.entering) return;
         this.entering = true;
+        this.doorHint.setVisible(false);
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.stop('Lobby');
