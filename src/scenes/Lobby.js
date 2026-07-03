@@ -1,6 +1,6 @@
 import { PlayerClass } from "../sprites/PlayerClass";
 import { WIDTH, HEIGHT } from '../const';
-import { Scene } from "phaser";
+import { Scene, Input, Geom } from "phaser";
 
 export class Lobby extends Scene {
     constructor() {
@@ -22,8 +22,8 @@ export class Lobby extends Scene {
         this.platforms.create(WIDTH/2, HEIGHT - 25, 'ground').setScale(2, 1).refreshBody();
 
         this.spawnCaveEntry(WIDTH/2-500, HEIGHT-50);
-
-        this.eKey = this.input.keyboard.addKey('E');
+        
+        this.entering = false;
     }
 
     update() {
@@ -40,7 +40,7 @@ export class Lobby extends Scene {
             this.doorHint.setPosition(this.doorZone.x, this.doorZone.y - 79);
         }
 
-        if (playerNearDoor && Phaser.Input.Keyboard.JustDown(this.eKey)) {
+        if (playerNearDoor && this.playerHandler.keys.e.isDown) {
             this.enterCave();
         }
     }

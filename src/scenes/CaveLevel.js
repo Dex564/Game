@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { WIDTH, HEIGHT, chunks, paths } from '../const';
-import { PlayerClass } from "./PlayerClass";
+import { PlayerClass } from "../sprites/PlayerClass";
 import { getRandomInt } from "../utils.js"
 
 const TILE_SIZE_X = 128;

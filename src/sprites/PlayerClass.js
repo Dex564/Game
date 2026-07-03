@@ -55,7 +55,8 @@ export class PlayerClass {
             left: 'a',
             right: 'd',
             dash: 'q',
-            attack: 'l'
+            attack: 'l',
+            e: 'e'
         });
         this.jumpKey1 = keyboard.addKey('space');
         this.jumpKey2 = this.keys.up; // дублируем для читаемости
