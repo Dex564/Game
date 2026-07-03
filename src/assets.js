@@ -39,6 +39,10 @@ export default {
         bgcave: {
             key: 'bgcave',
             args: ['assets/bgcave.png']
+        },
+        entry_leave: {
+            key: 'entry_leave',
+            args: ['assets/entry_leave.png']
         }
     },
     'spritesheet': {
