@@ -36,6 +36,8 @@ export class PlayerClass {
         this.player.setCollideWorldBounds(true);
         this.player.play('idle');
 
+        this.player.setDepth(10);
+
         this.initInput();
         this.createCamera();
         return this.player;
@@ -240,8 +242,8 @@ export class PlayerClass {
         }
 
         if (this.isAttacking) {
-            if (this.player.anims.currentAnim?.key !== 'attack') {
-                this.player.play('attack', true);
+            if (this.player.anims.currentAnim?.key !== 'spearAttack') {
+                this.player.play('spearAttack', true);
             }
             return;
         }

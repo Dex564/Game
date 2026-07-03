@@ -1,7 +1,7 @@
 export function createPlayerAnimations(anims) {
     anims.create({
         key: 'idle',
-        frames: anims.generateFrameNumbers('person', { start: 0, end: 0 }),
+        frames: anims.generateFrameNumbers('spearAttack', { start: 0, end: 0 }),
         frameRate: 11,
         repeat: -1
     });
@@ -46,9 +46,9 @@ export function createPlayerAnimations(anims) {
     });
 
     anims.create({
-        key: 'attack',
-        frames: anims.generateFrameNumbers('attack', {start: 0, end: 2}),
-        frameRate: 12,
+        key: 'spearAttack',
+        frames: anims.generateFrameNumbers('spearAttack', {start: 0, end: 2}),
+        frameRate: 15,
         // duration: 200,
         repeat: -1
     })
