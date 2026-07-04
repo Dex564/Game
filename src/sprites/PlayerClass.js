@@ -25,7 +25,13 @@ export class PlayerClass {
 
         this.coyoteTimer = 0;
         this.coyoteDuration = Const.COYOTE_DURATION;
-        this.lastTime = 0;
+        this._lastTime = 0;
+
+        // Параметры плавного движения
+        this.acceleration = 2500;
+        this.drag = 2000;
+        this.maxSpeedGround = Const.MOVE_SPEED_GROUND;
+        this.maxSpeedAir = Const.MOVE_SPEED_AIR;
     }
 
     /* --------------------------------------------------------------
@@ -41,6 +47,11 @@ export class PlayerClass {
         this.player.play('idle');
 
         this.player.setDepth(10);
+
+        this.player.setOrigin(0.5, 1);
+
+        this.player.setSize(20, 60);
+        this.player.setOffset(12, 2);
 
         this.initInput();
         this.createCamera();
@@ -63,7 +74,7 @@ export class PlayerClass {
             e: 'e'
         });
         this.jumpKey1 = keyboard.addKey('space');
-        this.jumpKey2 = this.keys.up; // дублируем для читаемости
+        this.jumpKey2 = this.keys.up;
         this.shiftKey = keyboard.addKey('SHIFT');
     }
 
@@ -71,7 +82,7 @@ export class PlayerClass {
        КАМЕРА
     ---------------------------------------------------------------- */
     createCamera() {
-        const camera = this.scene.cameras.add(0, 0, Const.WIDTH, Const.HEIGHT, true);
+        const camera = this.scene.cameras.main;
         camera.startFollow(this.player, true, 0.1, 1);
         camera.setBounds(0, 0, this.worldX, this.worldY, true);
         camera.setRoundPixels(true);
@@ -88,16 +99,17 @@ export class PlayerClass {
         this.handleWallInteraction();
         this.handleDash();
         this.handleAttack();
+        this.handleJumpRelease();
         this.updateAnimation();
     }
 
     // --- СОСТОЯНИЕ ПАДЕНИЯ --- //
     updateFallState() {
-        const onGround = this.player.body.onFloor();
+        const onGround = this.player.body.blocked.down;
         this.isFalling = !onGround && this.player.body.velocity.y > 0;
     }
 
-    // --- ДВИЖЕНИЕ ВЛЕВО/ВПРАВО И ПРЫЖОК --- //
+    // --- ДВИЖЕНИЕ ВЛЕВО/ВПРАВО И ПРЫЖОК (с ускорением) --- //
     handleMovement() {
         if (this.isDashing || !this.canControl) return;
 
@@ -106,21 +118,41 @@ export class PlayerClass {
         const jump = this.jumpKey1.isDown || this.jumpKey2.isDown;
         const onGround = this.player.body.onFloor();
 
-        // Горизонтальное движение
+        // --- ГОРИЗОНТАЛЬНОЕ ДВИЖЕНИЕ --- //
+        let targetSpeed = 0;
+        const maxSpeed = onGround ? this.maxSpeedGround : this.maxSpeedAir;
+
         if (left && !right) {
-            const speed = onGround ? 400 : 500;
-            this.player.setVelocityX(-speed);
+            targetSpeed = -maxSpeed;
             this.player.setFlipX(true);
         } else if (right && !left) {
-            const speed = onGround ? 400 : 500;
-            this.player.setVelocityX(speed);
+            targetSpeed = maxSpeed;
             this.player.setFlipX(false);
-        } else {
-            this.player.setVelocityX(0);
         }
 
+        // Плавное ускорение/торможение
+        const accel = this.acceleration * 0.016;
+        const drag = this.drag * 0.016;
+
+        if (targetSpeed !== 0) {
+            const diff = targetSpeed - this.player.body.velocity.x;
+            if (Math.abs(diff) < accel) {
+                this.player.setVelocityX(targetSpeed);
+            } else {
+                this.player.setVelocityX(this.player.body.velocity.x + Math.sign(diff) * accel);
+            }
+        } else {
+            if (Math.abs(this.player.body.velocity.x) < drag) {
+                this.player.setVelocityX(0);
+            } else {
+                const newVx = this.player.body.velocity.x - Math.sign(this.player.body.velocity.x) * drag;
+                this.player.setVelocityX(newVx);
+            }
+        }
+
+        // --- ПРЫЖОК --- //
         if (jump && (onGround || this.coyoteTimer > 0)) {
-            this.player.setVelocityY(-500);
+            this.player.setVelocityY(Const.JUMP_SPEED);
             this.coyoteTimer = 0;
         }
 
@@ -138,7 +170,6 @@ export class PlayerClass {
         const touchingRight = this.player.body.touching.right || this.player.body.blocked.right;
         const wantJump = this.jumpKey1.isDown || this.jumpKey2.isDown;
 
-        // Отскок от стены
         if (wantJump) {
             if (touchingLeft && this.wallJumpRight) {
                 this.performWallJump('right');
@@ -147,7 +178,6 @@ export class PlayerClass {
             }
         }
 
-        // Скольжение по стене 
         const moveIntoWall = (touchingLeft && this.keys.left.isDown) ||
                              (touchingRight && this.keys.right.isDown);
         if (moveIntoWall && !wantJump) {
@@ -162,10 +192,12 @@ export class PlayerClass {
     // --- ОТСКОК ОТ СТЕНЫ --- //
     performWallJump(side) {
         const isRight = side === 'right';
+        let speed = Const.MOVE_SPEED_AIR - 100
+        const wallJumpSpeed = isRight ? speed : -speed;
 
         this.player.x += isRight ? 6 : -6;
-        this.player.setVelocityX(isRight ? 300 : -300);
-        this.player.setVelocityY(-600);
+        this.player.setVelocityX(wallJumpSpeed);
+        this.player.setVelocityY(Const.JUMP_SPEED - 200);
         this.player.setFlipX(!isRight);
 
         this.canControl = false;
@@ -173,7 +205,7 @@ export class PlayerClass {
         else this.wallJumpLeft = false;
 
         this.scene.time.delayedCall(500, () => {
-            this.player.setVelocityX(0);
+            // this.player.setVelocityX(0);
             this.canControl = true;
         });
         this.scene.time.delayedCall(1180, () => {
@@ -204,7 +236,6 @@ export class PlayerClass {
 
         this.scene.time.delayedCall(Const.DASH_DURATION, () => {
             this.isDashing = false;
-            this.player.setVelocityX(0);
         });
         this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => {
             this.canDash = true;
@@ -217,10 +248,17 @@ export class PlayerClass {
 
         if (onGround) {
             this.coyoteTimer = this.coyoteDuration;
-             this._lastTime = this.scene.time.now;
+            this._lastTime = this.scene.time.now;
         } else {
             const elapsed = this.scene.time.now - this._lastTime;
             this.coyoteTimer = Math.max(0, this.coyoteDuration - elapsed);
+        }
+    }
+
+    // --- ПЕРЕМЕННАЯ ВЫСОТА ПРЫЖКА --- //
+    handleJumpRelease() {
+        if ((this.jumpKey1.justUp || this.jumpKey2.justUp) && this.player.body.velocity.y < 0) {
+            this.player.setVelocityY(this.player.body.velocity.y * 0.25);
         }
     }
 
@@ -255,10 +293,11 @@ export class PlayerClass {
 
         if (this.isAttacking) {
             if (this.player.anims.currentAnim?.key !== 'spearAttack') {
+                this.player.setOffset(70, 2);
                 this.player.play('spearAttack', true);
-            }
+            } 
             return;
-        }
+        } else this.player.setOffset(12, 2);
 
         const onGround = this.player.body.blocked.down || this.player.body.touching.down;
 
@@ -267,11 +306,8 @@ export class PlayerClass {
                              (this.keys.left.isDown && this.keys.right.isDown);
             if (standing) {
                 this.isRunning = false;
-                this.player.setSize(25, 62);
                 this.player.play('idle', true);
             } else {
-                // Начало бега или сам бег
-                this.player.setSize(25, 62);
                 if (!this.isRunning) {
                     this.player.play('startrun', true);
                     this.scene.time.delayedCall(100, () => {
@@ -282,9 +318,7 @@ export class PlayerClass {
                 }
             }
         } else {
-            // В воздухе
             this.isRunning = false;
-            this.player.setSize(27, 62);
             if (this.player.body.velocity.y > 0) {
                 this.player.play('fall', true);
             } else {
