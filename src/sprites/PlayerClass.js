@@ -61,15 +61,6 @@ export class PlayerClass {
         this.jumpKey1 = keyboard.addKey('space');
         this.jumpKey2 = this.keys.up; // дублируем для читаемости
         this.shiftKey = keyboard.addKey('SHIFT');
-
-        this.scene.input.on('pointerdown', (pointer) => {
-            if (pointer.leftButtonDown()) {
-                this.attackButtonPressed = true;
-                this.scene.time.delayedCall(Const.ATTACK_DURATION, () => {
-                    this.attackButtonPressed = false;
-                });
-            }
-        });
     }
 
    /* ----------------------------------------------------------------
@@ -87,9 +78,6 @@ export class PlayerClass {
        ОСНОВНОЙ ЦИКЛ ОБНОВЛЕНИЯ
     ---------------------------------------------------------------- */
     updatePlayer() {
-        if (this.isFalling) {
-            console.log('falling')
-        }
         this.updateFallState();
         this.handleMovement();
         this.handleWallInteraction();
@@ -221,8 +209,10 @@ export class PlayerClass {
     handleAttack() {
         if (this.isDashing || this.isAttacking || !this.player.body.blocked.down) return;
 
-        const attackKey = Phaser.Input.Keyboard.JustDown(this.keys.attack);
-        if (attackKey || this.attackButtonPressed) {
+        const attackKeyDown = this.keys.attack.isDown;
+        const LMBDown = this.scene.input.activePointer.leftButtonDown();
+
+        if (attackKeyDown || LMBDown) {
             this.isAttacking = true;
             this.canControl = false;
             this.canDash = false;
@@ -262,7 +252,7 @@ export class PlayerClass {
                 this.player.play('idle', true);
             } else {
                 // Начало бега или сам бег
-                this.player.setSize(33, 62);
+                this.player.setSize(25, 62);
                 if (!this.isRunning) {
                     this.player.play('startrun', true);
                     this.scene.time.delayedCall(100, () => {
