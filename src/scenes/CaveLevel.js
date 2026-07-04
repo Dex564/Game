@@ -8,6 +8,7 @@ const TILE_SIZE_Y = 64;
 const CHUNK_SIZE = 4;
 const CHUNKS_X = 10;
 const CHUNKS_Y = 5;
+const chestsAttempts = 5;
 
 export class CaveLevel extends Scene {
     constructor() {
@@ -33,12 +34,13 @@ export class CaveLevel extends Scene {
             this.entryY = savedLevel.entryY;
             this.leaveY = savedLevel.leaveY;
             this.layout = savedLevel.layout;
+            this.chests = savedLevel.chests;
             const lastAction = this.registry.get(`lastAction`);
             if (lastAction == 'entry') {
-                console.log('going back');
+                console.log('going backwards');
                 this.playerHandler.setPlayerPosition(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE-(TILE_SIZE_X*CHUNK_SIZE/2), TILE_SIZE_Y*CHUNK_SIZE*this.leaveY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             } else {
-                console.log('going forward');
+                console.log('going forwards');
                 this.playerHandler.setPlayerPosition(TILE_SIZE_X*CHUNK_SIZE/2, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             }
         } else {
@@ -46,22 +48,50 @@ export class CaveLevel extends Scene {
             this.leaveY = getRandomInt(1, CHUNKS_Y-2);
             this.layout = this.generateLayout();
 
-            this.registry.set(`layout-${this.number}`, { layout: this.layout, entryY: this.entryY, leaveY: this.leaveY });
+            this.chests = [];
+            let pushed = [];
+            for (let i = 0; i < chestsAttempts; i++) {
+                const x = getRandomInt(0, CHUNKS_X-1);
+                const y = getRandomInt(0, CHUNKS_Y-1);
+                if (!paths[3].has(this.layout[y][x]) && this.layout[y][x] != 11 && !pushed.includes(`${x}-${y}`)) {
+                    this.chests.push({id: pushed.length, x, y, looted: false, hitbox: null, hint: null});
+                    pushed.push(`${x}-${y}`);
+                }
+            }
+
+            this.saveLevel();
             this.playerHandler.setPlayerPosition(TILE_SIZE_X*CHUNK_SIZE/2, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
         }
         console.log(`layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         this.drawRoom(this.layout);
+        this.drawChests();
         this.processCollision();
         this.createEntryHitbox();
         this.createLeaveHitbox();
     }
+
+    saveLevel() {
+        this.registry.set(`layout-${this.number}`, { layout: this.layout, entryY: this.entryY, leaveY: this.leaveY, chests: this.chests });
+    }
     
     update() {
         this.playerHandler.updatePlayer();
+        const playerBounds = this.player.getBounds();
+        this.chests.forEach((chest, index) => {
+            if (!chest.hitbox || !chest.hint) return;
+            const chestBounds = chest.hitbox.getBounds();
+            const playerNearChest = Phaser.Geom.Intersects.RectangleToRectangle(
+                playerBounds, chestBounds
+            );
+            if (!chest.looted) chest.hint.setVisible(playerNearChest);
+            else chest.hint.setVisible(false);
+            if (!chest.looted && playerNearChest && this.playerHandler.keys.e.isDown) {
+                this.openChest(chest, index);
+            }
+        });
     }
     
     generateLayout() {
-        console.log(this.entryY, this.leaveY);
         const layout = [];
         for (let y = 0; y < CHUNKS_Y; y++) {
             const layer = [];
@@ -156,6 +186,38 @@ export class CaveLevel extends Scene {
             }
         }
     }
+
+    drawChests() {
+        this.chests.forEach((chest, index) => {
+            const posX = chest.x*TILE_SIZE_X*CHUNK_SIZE+(TILE_SIZE_X*2);
+            const posY = chest.y*TILE_SIZE_Y*CHUNK_SIZE+(TILE_SIZE_Y*(CHUNK_SIZE-1));
+            const hitbox = this.physics.add.staticSprite(posX, posY, chest.looted ? 'chest_opened' : 'chest')
+                .setOrigin(0.5, 1)
+                .refreshBody();
+            const hint = this.spawnHint(posX, posY-TILE_SIZE_Y, '[E]');
+            this.chests[index].hitbox = hitbox;
+            this.chests[index].hint = hint;
+        });
+    }
+
+    openChest(chest, index) {
+        const coins = getRandomInt(10, 20)
+        this.registry.inc('coins', coins);
+        console.log(`Chest looted, +${coins} coins`)
+        this.chests[index].looted = true;
+        chest.hitbox.setTexture('chest_opened');
+        this.saveLevel();
+    }
+
+    spawnHint(x, y, text) {
+        return this.add.text(x, y, text, {
+            fontSize: '20px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            backgroundColor: '#000000',
+            padding: { left: 8, right: 8, top: 4, bottom: 4 }
+        }).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+    }
     
     processCollision() {
         this.map.setCollision([0]);
@@ -165,7 +227,6 @@ export class CaveLevel extends Scene {
     createEntryHitbox() {
         this.entry = this.physics.add.staticGroup();
         this.entry.create(0, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+TILE_SIZE_Y, 'entry_leave')
-            .setVisible(true)
             .setOrigin(0)
             .refreshBody();
         this.physics.add.overlap(
@@ -178,7 +239,6 @@ export class CaveLevel extends Scene {
     createLeaveHitbox() {
         this.leave = this.physics.add.staticGroup();
         this.leave.create(TILE_SIZE_X*CHUNK_SIZE*CHUNKS_X-TILE_SIZE_Y, TILE_SIZE_Y*CHUNK_SIZE*this.leaveY+TILE_SIZE_Y, 'entry_leave')
-            .setVisible(true)
             .setOrigin(0)
             .setFlipX(true)
             .refreshBody();

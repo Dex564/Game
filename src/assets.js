@@ -43,6 +43,14 @@ export default {
         entry_leave: {
             key: 'entry_leave',
             args: ['assets/entry_leave.png']
+        },
+        chest: {
+            key: 'chest',
+            args: ['assets/chest.png']
+        },
+        chest_opened: {
+            key: 'chest_opened',
+            args: ['assets/chest_opened.png']
         }
     },
     'spritesheet': {
