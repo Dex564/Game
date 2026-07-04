@@ -22,6 +22,10 @@ export class PlayerClass {
         this.wallJumpLeft = true;
 
         this.isRunning = false;
+
+        this.coyoteTimer = 0;
+        this.coyoteDuration = Const.COYOTE_DURATION;
+        this.lastTime = 0;
     }
 
     /* --------------------------------------------------------------
@@ -79,6 +83,7 @@ export class PlayerClass {
     ---------------------------------------------------------------- */
     updatePlayer() {
         this.updateFallState();
+        this.updateCoyoteTimer();
         this.handleMovement();
         this.handleWallInteraction();
         this.handleDash();
@@ -88,7 +93,7 @@ export class PlayerClass {
 
     // --- СОСТОЯНИЕ ПАДЕНИЯ --- //
     updateFallState() {
-        const onGround = this.player.body.blocked.down;
+        const onGround = this.player.body.onFloor();
         this.isFalling = !onGround && this.player.body.velocity.y > 0;
     }
 
@@ -99,7 +104,7 @@ export class PlayerClass {
         const left = this.keys.left.isDown;
         const right = this.keys.right.isDown;
         const jump = this.jumpKey1.isDown || this.jumpKey2.isDown;
-        const onGround = this.player.body.blocked.down;
+        const onGround = this.player.body.onFloor();
 
         // Горизонтальное движение
         if (left && !right) {
@@ -114,8 +119,9 @@ export class PlayerClass {
             this.player.setVelocityX(0);
         }
 
-        if (jump && onGround) {
+        if (jump && (onGround || this.coyoteTimer > 0)) {
             this.player.setVelocityY(-500);
+            this.coyoteTimer = 0;
         }
 
         if (onGround) {
@@ -203,6 +209,19 @@ export class PlayerClass {
         this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => {
             this.canDash = true;
         });
+    }
+
+    // --- ВРЕМЯ КОЙОТА (ПОБЛАЖКА ДЛЯ ПРЫЖКА) --- //
+    updateCoyoteTimer() {
+        const onGround = this.player.body.onFloor();
+
+        if (onGround) {
+            this.coyoteTimer = this.coyoteDuration;
+             this._lastTime = this.scene.time.now;
+        } else {
+            const elapsed = this.scene.time.now - this._lastTime;
+            this.coyoteTimer = Math.max(0, this.coyoteDuration - elapsed);
+        }
     }
 
     // --- АТАКА --- //
