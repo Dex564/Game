@@ -1,4 +1,56 @@
 export default {
+    'audio': {
+        step: {
+            files: ['step1', 'step2', 'step3', 'step4', 'step5'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        jump: {
+            files: ['jump1', 'jump2'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        wallslide: {
+            files: ['wallslide'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        hit: {
+            files: ['hit1', 'hit2'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        chest: {
+            files: ['chest'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        coin: {
+            files: ['coins1', 'coins2', 'coins3', 'coins4', 'coins5', 'coins6'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        altar: {
+            files: ['altar'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        hit: {
+            files: ['hit1', 'hit2'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        land: {
+            files: ['land'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
+        dash: {
+            files: ['dash1', 'dash2'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        }
+    },
     'image': {
         background: {
             key: 'background',

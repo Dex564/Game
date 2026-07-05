@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import * as Const from '../const.js';
+import { getRandomInt } from '../utils.js';
 
 export class PlayerClass {
     constructor(scene, worldX = Const.WIDTH, worldY = Const.HEIGHT) {
@@ -8,6 +9,10 @@ export class PlayerClass {
         this.worldY = worldY;
         this.player = null;
         this.keys = {};
+
+        // Звуки
+        this.walkSound = false;
+        this.jumpSound = false;
         
         // Состояния
         this.canDash = true;
@@ -142,6 +147,13 @@ export class PlayerClass {
             } else {
                 this.player.setVelocityX(this.player.body.velocity.x + Math.sign(diff) * accel);
             }
+            if (onGround && !this.walkSound) {
+                this.walkSound = true;
+                this.scene.sound.play(`step${getRandomInt(1, 5)}`);
+                this.scene.time.delayedCall(500, () => {
+                    this.walkSound = false;
+                });
+            }
         } else {
             if (Math.abs(this.player.body.velocity.x) < drag) {
                 this.player.setVelocityX(0);
@@ -153,6 +165,13 @@ export class PlayerClass {
 
         // --- ПРЫЖОК --- //
         if (jump && (onGround || this.coyoteTimer > 0)) {
+            if (!this.jumpSound) {
+                this.jumpSound = true;
+                this.scene.sound.play(`jump${getRandomInt(1, 2)}`);
+                this.scene.time.delayedCall(500, () => {
+                    this.jumpSound = false;
+                });
+            }
             this.player.setVelocityY(Const.JUMP_SPEED);
             this.coyoteTimer = 0;
         }

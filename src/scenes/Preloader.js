@@ -32,6 +32,13 @@ export class Preloader extends Scene {
             this.load.spritesheet(item.key, item.args[0], item.args[1]);
         }
 
+        for (const key in assets.audio) {
+            const item = assets.audio[key];
+            for (const variation of item.files) {
+                this.load.audio(variation, `${item.path}/${variation}.${item.format}`);
+            }
+        }
+
         this.load.on('complete', () => {
             createPlayerAnimations(this.anims);
         });
