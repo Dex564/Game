@@ -8,6 +8,7 @@ export class Lobby extends Scene {
     }
 
     create() {
+        this.scene.launch('HUD', 'lobby');
         this.add.image(0, 0, 'background').setOrigin(0);
         this.playerHandler = new PlayerClass(this);
         this.player = this.playerHandler.createPlayer();
@@ -62,6 +63,7 @@ export class Lobby extends Scene {
         this.entering = true;
         this.doorHint.setVisible(false);
         this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.scene.stop('HUD');
         this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.stop('Lobby');
             this.scene.start('CaveLevel');

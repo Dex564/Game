@@ -16,6 +16,7 @@ export class CaveLevel extends Scene {
     }
     
     create() {
+        this.scene.launch('HUD', 'cave');
         this.add.image(0, 0, 'bgcave').setOrigin(0);
         this.add.image(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE/2, 0, 'bgcave').setOrigin(0);
         
@@ -27,7 +28,7 @@ export class CaveLevel extends Scene {
 
         this.entering = false;
 
-        this.number = this.registry.get(`currentLevel`) ?? 0;
+        this.number = this.registry.get(`currentLevel`) ?? 1;
 
         const savedLevel = this.registry.get(`layout-${this.number}`);
         if (savedLevel) {
@@ -68,6 +69,13 @@ export class CaveLevel extends Scene {
         this.processCollision();
         this.createEntryHitbox();
         this.createLeaveHitbox();
+
+        this.input.keyboard.on('keydown', (key) => {
+            if (key.code == 'Escape') {
+                this.scene.launch('Pause');
+                this.scene.pause('CaveLevel');
+            }
+        });
     }
 
     saveLevel() {
@@ -255,9 +263,9 @@ export class CaveLevel extends Scene {
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
             if (state == 'entry') {
-                if (this.number < 1) {
+                if (this.number <= 1) {
                     this.registry.set(`lastAction`, 'leave');
-                    this.registry.set(`currentLevel`, 0);
+                    this.registry.set(`currentLevel`, 1);
                     this.scene.stop('CaveLevel');
                     this.scene.start('Lobby');
                 } else {

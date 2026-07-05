@@ -1,12 +1,20 @@
 export default {
     'image': {
-        backgroundImage: {
+        background: {
             key: 'background',
-            args: ['assets/bg.png'] // args: ['assets/bg.png']
+            args: ['assets/bg.png']
         },
-        button: {
-            key: 'button',
-            args: ['assets/button.png']
+        start_button: {
+            key: 'start_button',
+            args: ['assets/start_button.png']
+        },
+        lobby_button: {
+            key: 'lobby_button',
+            args: ['assets/lobby_button.png']
+        },
+        continue_button: {
+            key: 'continue_button',
+            args: ['assets/continue_button.png']
         },
         platform: {
             key: 'ground',

@@ -34,6 +34,11 @@ export class Preloader extends Scene {
         this.load.on('complete', () => {
             createPlayerAnimations(this.anims);
         });
+
+        this.registry.set(`currentLevel`, 1);
+        this.registry.set(`maxLevel`, 1);
+        this.registry.set(`coins`, 0);
+        this.registry.set(`health`, 100);
     }
 
     create() {

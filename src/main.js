@@ -4,6 +4,8 @@ import { Game } from 'phaser';
 import { MainMenu } from './scenes/MainMenu';
 import { CaveLevel } from './scenes/CaveLevel';
 import { Preloader } from './scenes/Preloader';
+import { HUD } from './scenes/HUD';
+import { Pause } from './scenes/Pause';
 import * as Phaser from 'phaser';
 import * as Const from './const';
 
@@ -31,7 +33,9 @@ const config = {
         Preloader,
         MainMenu,
         Lobby,
-        CaveLevel
+        CaveLevel,
+        HUD,
+        Pause
     ]
 };
 
