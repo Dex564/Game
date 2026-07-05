@@ -38,9 +38,9 @@ export class CaveLevel extends Scene {
             this.chests = savedLevel.chests;
             const lastAction = this.registry.get(`lastAction`);
             if (lastAction == 'entry') {
-                this.playerHandler.setPlayerPosition(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE-(TILE_SIZE_X*CHUNK_SIZE/2), TILE_SIZE_Y*CHUNK_SIZE*this.leaveY+(TILE_SIZE_Y*CHUNK_SIZE/2));
+                this.playerHandler.setPlayerPosition(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE-TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.leaveY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             } else {
-                this.playerHandler.setPlayerPosition(TILE_SIZE_X*CHUNK_SIZE/2, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
+                this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             }
         } else {
             this.entryY = this.registry.get(`layout-${this.number-1}`)?.entryY ?? 0;
@@ -59,7 +59,7 @@ export class CaveLevel extends Scene {
             }
 
             this.saveLevel();
-            this.playerHandler.setPlayerPosition(TILE_SIZE_X*CHUNK_SIZE/2, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
+            this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
         }
         console.log(`Generated room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         this.drawRoom(this.layout);
