@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { WIDTH, HEIGHT } from '../const';
 import assets from '../assets.js';
 import { createPlayerAnimations } from '../animations.js';
+import { Storage } from '../classes/Storage.js';
 
 export class Preloader extends Scene {
     constructor() {
@@ -36,9 +37,9 @@ export class Preloader extends Scene {
         });
 
         this.registry.set(`currentLevel`, 1);
-        this.registry.set(`maxLevel`, 1);
-        this.registry.set(`coins`, 0);
-        this.registry.set(`health`, 100);
+        
+        const storage = new Storage(this.registry);
+        storage.load();
     }
 
     create() {

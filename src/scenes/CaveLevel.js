@@ -1,7 +1,8 @@
 import { Scene } from 'phaser';
 import { WIDTH, HEIGHT, chunks, paths } from '../const';
-import { PlayerClass } from "../sprites/PlayerClass";
-import { getRandomInt } from "../utils.js"
+import { PlayerClass } from "../classes/PlayerClass.js";
+import { getRandomInt } from "../utils.js";
+import { Storage } from '../classes/Storage.js';
 
 const TILE_SIZE_X = 128;
 const TILE_SIZE_Y = 64;
@@ -16,6 +17,7 @@ export class CaveLevel extends Scene {
     }
     
     create() {
+        this.storage = new Storage(this.registry);
         this.scene.launch('HUD', 'cave');
         this.add.image(0, 0, 'bgcave').setOrigin(0);
         this.add.image(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE/2, 0, 'bgcave').setOrigin(0);
@@ -42,8 +44,9 @@ export class CaveLevel extends Scene {
             } else {
                 this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             }
+            console.log(`Loaded room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         } else {
-            this.entryY = this.registry.get(`layout-${this.number-1}`)?.entryY ?? 0;
+            this.entryY = this.registry.get(`layout-${this.number-1}`)?.leaveY ?? 0;
             this.leaveY = getRandomInt(1, CHUNKS_Y-2);
             this.layout = this.generateLayout();
 
@@ -60,8 +63,8 @@ export class CaveLevel extends Scene {
 
             this.saveLevel();
             this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
+            console.log(`Generated room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         }
-        console.log(`Generated room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         this.drawRoom(this.layout);
         this.drawChests();
         this.processCollision();
@@ -78,6 +81,7 @@ export class CaveLevel extends Scene {
 
     saveLevel() {
         this.registry.set(`layout-${this.number}`, { layout: this.layout, entryY: this.entryY, leaveY: this.leaveY, chests: this.chests });
+        this.storage.save();
     }
     
     update() {
@@ -104,7 +108,7 @@ export class CaveLevel extends Scene {
             for (let x = 0; x < CHUNKS_X; x++) {
 
                 if (this.entryY === y && x === 0) {
-                    layer.push(5);
+                    y === 0 ? layer.push(5) : layer.push(10);
                     continue;
                 }
                 else if (this.leaveY === y && x === CHUNKS_X-1) {
@@ -274,6 +278,7 @@ export class CaveLevel extends Scene {
                 this.registry.set(`lastAction`, 'leave');
                 this.registry.set(`currentLevel`, this.number+1);
                 this.registry.set(`maxLevel`, this.number+1);
+                this.storage.save();
                 this.scene.restart();
             }
         });

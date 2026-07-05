@@ -16,6 +16,14 @@ export default {
             key: 'continue_button',
             args: ['assets/continue_button.png']
         },
+        reset_button: {
+            key: 'reset_button',
+            args: ['assets/reset_button.png']
+        },
+        confirm_button: {
+            key: 'confirm_button',
+            args: ['assets/confirm_button.png']
+        },
         platform: {
             key: 'ground',
             args: ['assets/ground.png']
