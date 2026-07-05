@@ -17,6 +17,7 @@ export class PlayerClass {
         this.isAttacking = false;
 
         this.canControl = true;
+        this.canDash = true;
 
         this.wallJumpRight = true;
         this.wallJumpLeft = true;
@@ -217,7 +218,7 @@ export class PlayerClass {
     // --- РЫВОК --- //
     handleDash() {
         const canDoDash = this.canDash && !this.isDashing &&
-                          !this.isAttacking && this.canControl;
+                          !this.isAttacking && (this.canControl || this.canDash);
 
         const dashKeyPressed = Phaser.Input.Keyboard.JustDown(this.keys.dash) ||
                                Phaser.Input.Keyboard.JustDown(this.shiftKey);
@@ -228,8 +229,13 @@ export class PlayerClass {
         if (this.keys.right.isDown && !this.keys.left.isDown) dashDir = 1;
         else if (this.keys.left.isDown && !this.keys.right.isDown) dashDir = -1;
 
-        if (dashDir === 0) return;
-
+        if (dashDir === 0){
+            return;    
+        } else if (dashDir == 1) {
+            this.player.setFlipX(false);
+        } else {
+            this.player.setFlipX(true);
+        }
         this.player.setVelocityX(dashDir * Const.DASH_SPEED);
         this.canDash = false;
         this.isDashing = true;
