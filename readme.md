@@ -1,2 +1,3 @@
 # Praktika game
-npm run dev
+
+Запуск: `npm run dev`

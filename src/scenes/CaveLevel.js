@@ -38,10 +38,8 @@ export class CaveLevel extends Scene {
             this.chests = savedLevel.chests;
             const lastAction = this.registry.get(`lastAction`);
             if (lastAction == 'entry') {
-                console.log('going backwards');
                 this.playerHandler.setPlayerPosition(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE-(TILE_SIZE_X*CHUNK_SIZE/2), TILE_SIZE_Y*CHUNK_SIZE*this.leaveY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             } else {
-                console.log('going forwards');
                 this.playerHandler.setPlayerPosition(TILE_SIZE_X*CHUNK_SIZE/2, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             }
         } else {
@@ -63,7 +61,7 @@ export class CaveLevel extends Scene {
             this.saveLevel();
             this.playerHandler.setPlayerPosition(TILE_SIZE_X*CHUNK_SIZE/2, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
         }
-        console.log(`layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
+        console.log(`Generated room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         this.drawRoom(this.layout);
         this.drawChests();
         this.processCollision();
@@ -209,9 +207,8 @@ export class CaveLevel extends Scene {
     }
 
     openChest(chest, index) {
-        const coins = getRandomInt(10, 20)
+        const coins = getRandomInt(10, 20+this.number);
         this.registry.inc('coins', coins);
-        console.log(`Chest looted, +${coins} coins`)
         this.chests[index].looted = true;
         chest.hitbox.setTexture('chest_opened');
         this.saveLevel();
