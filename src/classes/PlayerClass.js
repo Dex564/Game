@@ -17,6 +17,7 @@ export class PlayerClass {
         // Состояния
         this.canDash = true;
         this.isDashing = false;
+        this.isSliding = false;
 
         this.attackButtonPressed = false;
         this.isAttacking = false;
@@ -203,9 +204,11 @@ export class PlayerClass {
         if (moveIntoWall && !wantJump) {
             this.player.body.allowGravity = false;
             this.player.setVelocityY(Const.WALL_SLIDE_SPEED);
+            this.isSliding = true;
             // анимация wallslide на будущее
         } else {
             this.player.body.allowGravity = true;
+            this.isSliding = false;
         }
     }
 
@@ -345,7 +348,11 @@ export class PlayerClass {
         } else {
             this.isRunning = false;
             if (this.player.body.velocity.y > 0) {
-                this.player.play('fall', true);
+                if (!this.isSliding) {
+                    this.player.play('fall', true);
+                } else {
+                    this.player.play('run', true);
+                }
             } else {
                 this.player.play('jump', true);
             }
