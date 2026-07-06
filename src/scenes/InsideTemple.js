@@ -23,7 +23,7 @@ export class InsideTemple extends Scene {
         this.drawGround();
 
         this.spawnNewLevel();
-        this.spawnLastLevel();
+        if (this.registry.has('layout-1')) this.spawnLastLevel();
         this.spawnToLobby();
 
         this.cameras.main.fadeIn(500, 0, 0, 0);
@@ -43,25 +43,30 @@ export class InsideTemple extends Scene {
 
         const playerBounds = this.player.getBounds();
         const newLevelBounds = this.newLevel.getBounds();
-        const lastLevelBounds = this.lastLevel.getBounds();
 
         const nearNewLevel = Phaser.Geom.Intersects.RectangleToRectangle(
             playerBounds, newLevelBounds
         );
-        const nearlastLevel = Phaser.Geom.Intersects.RectangleToRectangle(
-            playerBounds, lastLevelBounds
-        );
 
         this.newLevelHint.setVisible(nearNewLevel);
-        this.lastLevelHint1.setVisible(nearlastLevel);
-        this.lastLevelHint2.setVisible(nearlastLevel);
-
+        
         if (nearNewLevel && this.playerHandler.keys.e.isDown) {
             this.enterNew();
         }
 
-        if (nearlastLevel && this.playerHandler.keys.e.isDown) {
-            this.enterLast();
+        if (this.registry.has('layout-1')) {
+            const lastLevelBounds = this.lastLevel.getBounds();
+
+            const nearlastLevel = Phaser.Geom.Intersects.RectangleToRectangle(
+                playerBounds, lastLevelBounds
+            );
+
+            this.lastLevelHint1.setVisible(nearlastLevel);
+            this.lastLevelHint2.setVisible(nearlastLevel);
+
+            if (nearlastLevel && this.playerHandler.keys.e.isDown) {
+                this.enterLast();
+            }
         }
     }
 
@@ -96,15 +101,12 @@ export class InsideTemple extends Scene {
     }
 
     spawnLastLevel() {
-        this.lastLevel = this.add.image(448, this.worldY-32, 'entry_cave').setOrigin(0, 1);
-        this.lastLevelHint1 = this.add.text(448+64, this.worldY-150, 'Продолжить', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
-        this.lastLevelHint2 = this.add.text(448+64, this.worldY-125, '(50 монет)', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+        this.lastLevel = this.add.image(512, this.worldY-32, 'entry_cave').setOrigin(0, 1);
+        this.lastLevelHint1 = this.add.text(512+64, this.worldY-150, 'Продолжить', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+        this.lastLevelHint2 = this.add.text(512+64, this.worldY-125, '(50 монет)', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
     }
 
     spawnToLobby() {
-        if (this.entering) return;
-        this.entering = true;
-        
         this.toLobby = this.physics.add.staticGroup();
         this.toLobby.create(this.worldX, this.worldY-32, 'entry_leave')
             .setOrigin(1, 1)
@@ -113,7 +115,11 @@ export class InsideTemple extends Scene {
         this.physics.add.overlap(
             this.player,
             this.toLobby,
-            () => {this.changeScene('Lobby')}
+            () => {
+                if (this.entering) return;
+                this.entering = true;
+                this.changeScene('Lobby')
+            }
         );
     }
 
@@ -144,7 +150,10 @@ export class InsideTemple extends Scene {
         this.entering = true;
 
         const coins = this.registry.get('coins');
-        if (coins < 50) return;
+        if (coins < 50) {
+            this.entering = false;
+            return;
+        }
         this.registry.inc('coins', -50);
         const maxLevel = this.registry.get('maxLevel');
         this.registry.set('currentLevel', maxLevel);
