@@ -20,7 +20,7 @@ export class HUD extends Scene {
         this.registry.events.on('changedata-coins', (parent, value) => {
             this.coinCounter.setText(`Монеты: ${value}`);
         })
-        if (parentScene == 'cave') {
+        if (parentScene == 'CaveLevel') {
             this.roomCounter = this.add.text(WIDTH-20, 20, `Комната: ${current}/${max}`, { 
                 fontFamily: 'Arial Black', 
                 fontSize: 38, 

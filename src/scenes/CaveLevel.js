@@ -18,7 +18,7 @@ export class CaveLevel extends Scene {
     
     create() {
         this.storage = new Storage(this.registry);
-        this.scene.launch('HUD', 'cave');
+        this.scene.launch('HUD', 'CaveLevel');
         this.add.image(0, 0, 'bgcave').setOrigin(0);
         this.add.image(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE/2, 0, 'bgcave').setOrigin(0);
         
@@ -73,7 +73,7 @@ export class CaveLevel extends Scene {
 
         this.input.keyboard.on('keydown', (key) => {
             if (key.code == 'Escape') {
-                this.scene.launch('Pause');
+                this.scene.launch('Pause', 'CaveLevel');
                 this.scene.pause('CaveLevel');
             }
         });

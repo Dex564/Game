@@ -6,7 +6,7 @@ export class Pause extends Scene {
         super('Pause');
     }
     
-    create() {
+    create(parentLevel) {
         const overlay = this.add.graphics();
         overlay.fillStyle(0x000000, 0.7);
         overlay.fillRect(0, 0, WIDTH, HEIGHT);
@@ -19,20 +19,27 @@ export class Pause extends Scene {
         }).setOrigin(0.5, 0);
 
         this.add.image(WIDTH/2, HEIGHT/2-150, 'continue_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
-            this.scene.resume('CaveLevel');
+            this.scene.resume(parentLevel);
             this.scene.stop('Pause');
         }).setOrigin(0.5, 0);
-
-        this.add.image(WIDTH/2, HEIGHT/2, 'lobby_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
-            this.registry.set(`lastAction`, 'leave');
-            this.scene.stop('CaveLevel');
-            this.scene.start('Lobby');
-            this.scene.stop('Pause');
-        }).setOrigin(0.5, 0);
+        if (parentLevel == 'CaveLevel') {
+            this.add.image(WIDTH/2, HEIGHT/2, 'lobby_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
+                this.registry.set(`lastAction`, 'leave');
+                this.scene.stop(parentLevel);
+                this.scene.start('Lobby');
+                this.scene.stop('Pause');
+            }).setOrigin(0.5, 0);
+        } else {
+            this.add.image(WIDTH/2, HEIGHT/2, 'menu_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
+                this.scene.stop(parentLevel);
+                this.scene.start('MainMenu');
+                this.scene.stop('Pause');
+            }).setOrigin(0.5, 0);
+        }
 
         this.input.keyboard.on('keydown', (key) => {
             if (key.code == 'Escape') {
-                this.scene.resume('CaveLevel');
+                this.scene.resume(parentLevel);
                 this.scene.stop('Pause');
             }
         });

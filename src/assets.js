@@ -76,6 +76,10 @@ export default {
             key: 'confirm_button',
             args: ['assets/confirm_button.png']
         },
+        menu_button: {
+            key: 'menu_button',
+            args: ['assets/menu_button.png']
+        },
         platform: {
             key: 'ground',
             args: ['assets/ground.png']

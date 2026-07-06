@@ -10,7 +10,7 @@ export class Preloader extends Scene {
     }
 
     init() {
-        // --- Прогрес бар ---
+        // --- Прогресс бар ---
         this.add.rectangle(WIDTH/2, HEIGHT/2, 468, 32).setStrokeStyle(1, 0xffffff);
         const bar = this.add.rectangle(WIDTH/2-230, HEIGHT/2, 4, 28, 0xffffff);
         this.load.on('progress', (progress) => {
@@ -47,6 +47,8 @@ export class Preloader extends Scene {
         
         const storage = new Storage(this.registry);
         storage.load();
+
+        this.game.sound.volume = 0.3;
     }
 
     create() {

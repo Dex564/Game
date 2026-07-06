@@ -8,7 +8,7 @@ export class Lobby extends Scene {
     }
 
     create() {
-        this.scene.launch('HUD', 'lobby');
+        this.scene.launch('HUD', 'Lobby');
         this.add.image(0, 0, 'background').setOrigin(0);
         this.playerHandler = new PlayerClass(this);
         this.player = this.playerHandler.createPlayer();
@@ -25,6 +25,13 @@ export class Lobby extends Scene {
         this.spawnCaveEntry(WIDTH/2-500, HEIGHT-50);
 
         this.entering = false;
+
+        this.input.keyboard.on('keydown', (key) => {
+            if (key.code == 'Escape') {
+                this.scene.launch('Pause', 'Lobby');
+                this.scene.pause('Lobby');
+            }
+        });
     }
 
     update() {
