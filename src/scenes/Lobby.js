@@ -64,8 +64,8 @@ export class Lobby extends Scene {
         this.entering = true;
         this.doorHint.setVisible(false);
         this.cameras.main.fadeOut(500, 0, 0, 0);
-        this.scene.stop('HUD');
         this.cameras.main.once('camerafadeoutcomplete', () => {
+            this.scene.stop('HUD');
             this.scene.stop('Lobby');
             this.scene.start('InsideTemple');
         });

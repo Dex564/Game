@@ -12,6 +12,13 @@ export class InsideTemple extends Scene {
     
     create() {
         this.storage = new Storage(this.registry);
+
+        this.entering = false;
+
+        this.maxLevel = this.registry.get('maxLevel') ?? 1;
+        this.coins = this.registry.get('coins') ?? 0;
+        this.requiredCoins = this.maxLevel === 1 ? 0 : this.maxLevel*5;
+
         this.scene.launch('HUD', 'InsideTemple');
         this.add.image(0, 0, 'bg_inside').setOrigin(0);
         this.playerHandler = new PlayerClass(this, this.worldX, this.worldY);
@@ -27,8 +34,6 @@ export class InsideTemple extends Scene {
         this.spawnToLobby();
 
         this.cameras.main.fadeIn(500, 0, 0, 0);
-
-        this.entering = false;
 
         this.input.keyboard.on('keydown', (key) => {
             if (key.code == 'Escape') {
@@ -103,7 +108,7 @@ export class InsideTemple extends Scene {
     spawnLastLevel() {
         this.lastLevel = this.add.image(512, this.worldY-32, 'entry_cave').setOrigin(0, 1);
         this.lastLevelHint1 = this.add.text(512+64, this.worldY-150, 'Продолжить', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
-        this.lastLevelHint2 = this.add.text(512+64, this.worldY-125, '(50 монет)', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+        this.lastLevelHint2 = this.add.text(512+64, this.worldY-125, `(${this.requiredCoins} монет)`, hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
     }
 
     spawnToLobby() {
@@ -126,6 +131,7 @@ export class InsideTemple extends Scene {
     changeScene(scene) {
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
+            this.scene.stop('HUD');
             this.scene.stop('InsideTemple');
             this.scene.start(scene);
         });
@@ -134,9 +140,7 @@ export class InsideTemple extends Scene {
     enterNew() {
         if (this.entering) return;
         this.entering = true;
-
-        const maxLevel = this.registry.get('maxLevel');
-        for (let i = 1; i <= maxLevel; i++) {
+        for (let i = 1; i <= this.maxLevel; i++) {
             this.registry.remove(`layout-${i}`);
         }
         this.registry.set('maxLevel', 1);
@@ -149,14 +153,12 @@ export class InsideTemple extends Scene {
         if (this.entering) return;
         this.entering = true;
 
-        const coins = this.registry.get('coins');
-        if (coins < 50) {
+        if (this.coins < this.requiredCoins) {
             this.entering = false;
             return;
         }
-        this.registry.inc('coins', -50);
-        const maxLevel = this.registry.get('maxLevel');
-        this.registry.set('currentLevel', maxLevel);
+        this.registry.inc('coins', -(this.requiredCoins));
+        this.registry.set('currentLevel', this.maxLevel);
         this.storage.save();
         this.changeScene('CaveLevel');
     }
