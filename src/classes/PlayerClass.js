@@ -138,7 +138,7 @@ export class PlayerClass {
 
         // Плавное ускорение/торможение
         const accel = this.acceleration * 0.016;
-        const drag = this.drag * 0.016;
+        const drag = this.drag * 0.032;
 
         if (targetSpeed !== 0) {
             const diff = targetSpeed - this.player.body.velocity.x;
@@ -224,7 +224,7 @@ export class PlayerClass {
         if (isRight) this.wallJumpRight = false;
         else this.wallJumpLeft = false;
 
-        this.scene.time.delayedCall(500, () => {
+        this.scene.time.delayedCall(200, () => {
             // this.player.setVelocityX(0);
             this.canControl = true;
         });
