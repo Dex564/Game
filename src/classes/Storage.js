@@ -7,6 +7,7 @@ export class Storage {
     }
 
     save() {
+        this.clear();
         const coins = this.registry.get('coins') ?? this.defaultCoins;
         const health = this.registry.get('health') ?? this.defaultHealth;
         const maxLevel = this.registry.get('maxLevel') ?? this.defaultMaxLevel;

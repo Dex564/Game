@@ -56,6 +56,22 @@ export default {
             key: 'background',
             args: ['assets/bg.png']
         },
+        bgcave: {
+            key: 'bgcave',
+            args: ['assets/bgcave.png']
+        },
+        bg_inside: {
+            key: 'bg_inside',
+            args: ['assets/bg_inside.png']
+        },
+        mud_ground: {
+            key: 'mud_ground',
+            args: ['assets/mud_ground.png']
+        },
+        stone_ground: {
+            key: 'stone_ground',
+            args: ['assets/stone_ground.png']
+        },
         start_button: {
             key: 'start_button',
             args: ['assets/start_button.png']
@@ -108,13 +124,13 @@ export default {
             key: 'tile',
             args: ['assets/tile.png']
         },
-        bgcave: {
-            key: 'bgcave',
-            args: ['assets/bgcave.png']
-        },
         entry_leave: {
             key: 'entry_leave',
             args: ['assets/entry_leave.png']
+        },
+        entry_cave: {
+            key: 'entry_cave',
+            args: ['assets/entry_cave.png']
         },
         chest: {
             key: 'chest',

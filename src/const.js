@@ -13,6 +13,14 @@ export const DASH_DURATION = 1;
 export const WALL_SLIDE_SPEED = 50; 
 export const GRAVITY = 1800;
 
+export const hintStyle = {
+    fontSize: '20px',
+    fontFamily: 'Arial',
+    color: '#ffffff',
+    backgroundColor: '#000000',
+    padding: { left: 8, right: 8, top: 4, bottom: 4 }
+};
+
 export const chunks = [
     [
         [0, 0, 0, 0],

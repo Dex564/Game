@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { WIDTH, HEIGHT, chunks, paths } from '../const';
+import { WIDTH, HEIGHT, chunks, paths, hintStyle } from '../const';
 import { PlayerClass } from "../classes/PlayerClass.js";
 import { getRandomInt } from "../utils.js";
 import { Storage } from '../classes/Storage.js';
@@ -221,13 +221,7 @@ export class CaveLevel extends Scene {
     }
 
     spawnHint(x, y, text) {
-        return this.add.text(x, y, text, {
-            fontSize: '20px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            padding: { left: 8, right: 8, top: 4, bottom: 4 }
-        }).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+        return this.add.text(x, y, text, hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
     }
     
     processCollision() {

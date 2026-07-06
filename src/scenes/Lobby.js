@@ -1,5 +1,5 @@
 import { PlayerClass } from "../classes/PlayerClass";
-import { WIDTH, HEIGHT } from '../const';
+import { WIDTH, HEIGHT, hintStyle } from '../const';
 import { Scene, Input, Geom } from "phaser";
 
 export class Lobby extends Scene {
@@ -56,13 +56,7 @@ export class Lobby extends Scene {
     spawnCaveEntry(x, y) {
         this.temple = this.add.image(x, y, 'mainTemple').setOrigin(1, 1);
         this.doorZone = this.add.zone(x-100, y-14, 36, 63).setOrigin(0.5, 0.5);
-        this.doorHint = this.add.text(0, 0, '[E]', {
-            fontSize: '20px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            padding: { left: 8, right: 8, top: 4, bottom: 4 }
-        }).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+        this.doorHint = this.add.text(0, 0, '[E]', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
     }
 
     enterCave() {
@@ -73,7 +67,7 @@ export class Lobby extends Scene {
         this.scene.stop('HUD');
         this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.stop('Lobby');
-            this.scene.start('CaveLevel');
+            this.scene.start('InsideTemple');
         });
     }
 }

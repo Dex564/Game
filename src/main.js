@@ -1,4 +1,3 @@
-import { Boot } from './scenes/Boot';
 import { Lobby } from './scenes/Lobby';
 import { Game } from 'phaser';
 import { MainMenu } from './scenes/MainMenu';
@@ -16,7 +15,7 @@ const config = {
     width: Const.WIDTH,
     height: Const.HEIGHT,
     parent: 'game-container',
-    backgroundColor: '#6a7177',
+    backgroundColor: '#181819',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
@@ -30,10 +29,10 @@ const config = {
         }
     },
     scene: [
-        Boot,
         Preloader,
         MainMenu,
         Lobby,
+        InsideTemple,
         CaveLevel,
         HUD,
         Pause,

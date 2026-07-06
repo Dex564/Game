@@ -22,7 +22,7 @@ export class Pause extends Scene {
             this.scene.resume(parentLevel);
             this.scene.stop('Pause');
         }).setOrigin(0.5, 0);
-        if (parentLevel == 'CaveLevel') {
+        if (parentLevel == 'CaveLevel' || parentLevel == 'InsideTemple') {
             this.add.image(WIDTH/2, HEIGHT/2, 'lobby_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
                 this.registry.set(`lastAction`, 'leave');
                 this.scene.stop(parentLevel);
