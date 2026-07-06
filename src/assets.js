@@ -46,11 +46,11 @@ export default {
         },
         chest: {
             key: 'chest',
-            args: ['assets/chest.png']
+            args: ['assets/Chest1.png']
         },
         chest_opened: {
             key: 'chest_opened',
-            args: ['assets/chest_opened.png']
+            args: ['assets/Opend_chest1.png']
         }
     },
     'spritesheet': {
