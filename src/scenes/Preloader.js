@@ -48,7 +48,7 @@ export class Preloader extends Scene {
         const storage = new Storage(this.registry);
         storage.load();
 
-        this.game.sound.volume = 0.3;
+        this.game.sound.volume = 0.5;
     }
 
     create() {
