@@ -1,16 +1,21 @@
 import { Scene } from 'phaser';
-import { WIDTH, HEIGHT, hintStyle } from '../const.js';
+import {
+    WIDTH,
+    HEIGHT,
+    ENEMY_HEALTH,
+    hintStyle,
+    TILE_SIZE_X,
+    TILE_SIZE_Y,
+    CHUNK_SIZE,
+    CHUNKS_X,
+    CHUNKS_Y,
+    chestsAttempts,
+    enemiesAttempts
+} from '../const.js';
 import { PlayerClass } from "../classes/PlayerClass.js";
 import { getRandomInt, generateChunk } from "../utils.js";
 import { Storage } from '../classes/Storage.js';
 import { MazeGenerator } from '../classes/MazeGenerator.js';
-
-const TILE_SIZE_X = 128;
-const TILE_SIZE_Y = 64;
-const CHUNK_SIZE = 4;
-const CHUNKS_X = 10;
-const CHUNKS_Y = 5;
-const chestsAttempts = 5;
 
 export class CaveLevel extends Scene {
     constructor() {
@@ -39,6 +44,7 @@ export class CaveLevel extends Scene {
             this.leaveY = savedLevel.leaveY;
             this.layout = savedLevel.layout;
             this.chests = savedLevel.chests;
+            this.enemies = savedLevel.enemies;
             const lastAction = this.registry.get(`lastAction`);
             if (lastAction == 'entry') {
                 this.playerHandler.setPlayerPosition(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE-TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.leaveY+(TILE_SIZE_Y*CHUNK_SIZE/2));
@@ -54,15 +60,9 @@ export class CaveLevel extends Scene {
             this.layout = generator.getMaze();
 
             this.chests = [];
-            let pushed = [];
-            for (let i = 0; i < chestsAttempts; i++) {
-                const x = getRandomInt(0, CHUNKS_X-1);
-                const y = getRandomInt(0, CHUNKS_Y-1);
-                if (!this.layout[y][x][1]) {
-                    this.chests.push({id: pushed.length, x, y, looted: false, hitbox: null, hint: null});
-                    pushed.push(`${x}-${y}`);
-                }
-            }
+            this.enemies = [];
+
+            this.generateObjects();
 
             this.saveLevel();
             this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
@@ -70,6 +70,7 @@ export class CaveLevel extends Scene {
         }
         this.drawRoom(this.layout);
         this.drawChests();
+        this.spawnEnemies();
         this.processCollision();
         this.createEntryHitbox();
         this.createLeaveHitbox();
@@ -83,7 +84,13 @@ export class CaveLevel extends Scene {
     }
 
     saveLevel() {
-        this.registry.set(`layout-${this.number}`, { layout: this.layout, entryY: this.entryY, leaveY: this.leaveY, chests: this.chests });
+        this.registry.set(`layout-${this.number}`, { 
+            layout: this.layout,
+            entryY: this.entryY,
+            leaveY: this.leaveY,
+            chests: this.chests,
+            enemies: this.enemies
+        });
         this.storage.save();
     }
     
@@ -104,9 +111,26 @@ export class CaveLevel extends Scene {
         });
     }
     
-    generateLayout() {
-        const layout = new MazeGenerator(CHUNKS_X, CHUNKS_Y, )
-        return layout;
+    generateObjects() {
+        let pushed = [];
+        for (let i = 0; i < chestsAttempts; i++) {
+            const x = getRandomInt(0, CHUNKS_X-1);
+            const y = getRandomInt(0, CHUNKS_Y-1);
+            if (!this.layout[y][x][1]) {
+                this.chests.push({id: pushed.length, x, y, looted: false, hitbox: null, hint: null});
+                pushed.push(`${x}-${y}`);
+            }
+        }
+        
+        pushed = [];
+        for (let i = 0; i < enemiesAttempts; i++) {
+            const x = getRandomInt(0, CHUNKS_X-1);
+            const y = getRandomInt(0, CHUNKS_Y-1);
+            if (!this.layout[y][x][1]) {
+                this.enemies.push({id: pushed.length, x, y, health: ENEMY_HEALTH, hitbox: null});
+                pushed.push(`${x}-${y}`);
+            }
+        }
     }
     
     drawRoom(layout) {
@@ -153,6 +177,18 @@ export class CaveLevel extends Scene {
         });
     }
 
+    spawnEnemies() {
+        this.enemies.forEach((enemy, index) => {
+            const posX = enemy.x*TILE_SIZE_X*CHUNK_SIZE+(TILE_SIZE_X*2);
+            const posY = enemy.y*TILE_SIZE_Y*CHUNK_SIZE+(TILE_SIZE_Y*(CHUNK_SIZE-1));
+            const hitbox = this.physics.add.sprite(posX, posY, 'skeleton')
+                .setOrigin(0.5, 1)
+                .refreshBody();
+            hitbox.setCollideWorldBounds(true);
+            this.enemies[index].hitbox = hitbox;
+        });
+    }
+
     openChest(chest, index) {
         this.sound.play(`chest`);
         const coins = getRandomInt(10, 20+this.number);
@@ -170,6 +206,9 @@ export class CaveLevel extends Scene {
     processCollision() {
         this.map.setCollision([0]);
         this.physics.add.collider(this.player, this.layer);
+        this.enemies.forEach((enemy) => {
+            this.physics.add.collider(enemy.hitbox, this.layer);
+        });
     }
 
     createEntryHitbox() {

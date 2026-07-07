@@ -139,6 +139,10 @@ export default {
         chest_opened: {
             key: 'chest_opened',
             args: ['assets/Opend_chest1.png']
+        },
+        skeleton: {
+            key: 'skeleton',
+            args: ['assets/skeleton.png']
         }
     },
     'spritesheet': {

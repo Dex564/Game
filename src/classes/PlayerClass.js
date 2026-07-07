@@ -227,7 +227,7 @@ export class PlayerClass {
         if (isRight) this.wallJumpRight = false;
         else this.wallJumpLeft = false;
 
-        this.scene.time.delayedCall(200, () => {
+        this.scene.time.delayedCall(300, () => {
             // this.player.setVelocityX(0);
             this.canControl = true;
         });

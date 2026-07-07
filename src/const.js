@@ -13,6 +13,16 @@ export const DASH_DURATION = 1;
 export const WALL_SLIDE_SPEED = 50; 
 export const GRAVITY = 1800;
 
+export const ENEMY_HEALTH = 20;
+
+export const TILE_SIZE_X = 128;
+export const TILE_SIZE_Y = 64;
+export const CHUNK_SIZE = 4;
+export const CHUNKS_X = 10;
+export const CHUNKS_Y = 5;
+export const chestsAttempts = 5;
+export const enemiesAttempts = 5;
+
 export const hintStyle = {
     fontSize: '20px',
     fontFamily: 'Arial',
