@@ -4,14 +4,14 @@ export class Bat extends Enemy {
     constructor(scene, x, y) {
         super(scene, x, y, 'batEnemy');
         this.hp = 20;
-        // this.speed = 50;
+        this.speed = 120;
         
         this.gettingDamaged = false;
     }
 
     update() {
+        this.moveTowardsPlayer()
         this.updateAnims();
-        // логика движения
     }
 
     takeDamage(damage) {
@@ -19,6 +19,35 @@ export class Bat extends Enemy {
         this.gettingDamaged = true;
         if (this.hp > 0) this.scene.time.delayedCall(100, () => this.gettingDamaged = false);
         
+    }
+
+    moveTowardsPlayer() {
+        const player = this.scene.player;
+
+        if (!player || !player.active) {
+            this.setVelocity(0, 0);
+            return;
+        }
+
+        if (this.gettingDamaged) {
+            this.setVelocity(0, 0);
+            return;
+        }
+
+        const dx = Math.abs(this.x - this.scene.player.x);
+        const dy = Math.abs(this.y - this.scene.player.y);
+
+        if (dx < 300 && dy < 140) {
+            this.scene.physics.moveToObject(this, player, this.speed);
+        } else {
+            this.setVelocity(0, 0);
+        }
+
+        if (this.body.velocity.x > 0) {
+            this.setFlipX(true);
+        } else if (this.body.velocity.x < 0) {
+            this.setFlipX(false);
+        }
     }
 
     updateAnims() {
