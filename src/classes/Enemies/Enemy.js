@@ -24,9 +24,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     // Метод для удаления врага из массива сцены
     destroy() {
-        const index = this.scene.enemies.findIndex(e => e.hitbox === this);
-        if (index !== -1) {
-            this.scene.enemies.splice(index, 1);
+        if (this.scene && this.scene.enemies) {
+            const index = this.scene.enemies.findIndex(e => e.hitbox === this);
+            if (index !== -1) {
+                this.scene.enemies.splice(index, 1);
+            }
         }
         super.destroy();
     }
