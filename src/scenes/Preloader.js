@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { WIDTH, HEIGHT } from '../const';
 import assets from '../assets.js';
-import { createPlayerAnimations } from '../animations.js';
+import * as Anims from '../animations.js';
 import { Storage } from '../classes/Storage.js';
 
 export class Preloader extends Scene {
@@ -40,7 +40,8 @@ export class Preloader extends Scene {
         }
 
         this.load.on('complete', () => {
-            createPlayerAnimations(this.anims);
+            Anims.createPlayerAnimations(this.anims);
+            Anims.createBatAnimations(this.anims)
         });
 
         this.registry.set(`currentLevel`, 1);

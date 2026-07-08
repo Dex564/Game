@@ -39,6 +39,13 @@ export class PlayerClass {
         this.drag = 2000;
         this.maxSpeedGround = Const.MOVE_SPEED_GROUND;
         this.maxSpeedAir = Const.MOVE_SPEED_AIR;
+
+        // Комбат
+        this.baseDamage = 10;
+        this.playerDamage = this.baseDamage;
+        this.healthPoints = 100;
+        this.attackRange = 90;
+        this.attackHeight = 40;
     }
 
     /* --------------------------------------------------------------
@@ -303,11 +310,31 @@ export class PlayerClass {
             this.canDash = false;
             this.player.setVelocityX(0);
 
+            this.performAttack();
+
             this.scene.time.delayedCall(Const.ATTACK_DURATION, () => {
                 this.isAttacking = false;
                 this.canControl = true;
                 this.canDash = true;
             });
+        }
+    }
+
+    performAttack() {
+        if (!this.scene.enemies || !Array.isArray(this.scene.enemies)) return;
+
+        const playerX = this.player.x;
+        const playerY = this.player.y - 30;
+        const dir = this.player.flipX ? -1 : 1;
+
+        for (let enemyData of this.scene.enemies) {
+            const enemy = enemyData.hitbox;
+            if (!enemy || !enemy.active) continue;
+            const dx = enemy.x - playerX;
+            const dy = enemy.y - playerY;
+            if (dx * dir > 0 && Math.abs(dx) < this.attackRange && Math.abs(dy) < this.attackHeight) {
+                enemy.takeDamage(this.playerDamage);
+            }
         }
     }
 

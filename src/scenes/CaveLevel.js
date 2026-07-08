@@ -16,6 +16,8 @@ import { PlayerClass } from "../classes/PlayerClass.js";
 import { getRandomInt, generateChunk } from "../utils.js";
 import { Storage } from '../classes/Storage.js';
 import { MazeGenerator } from '../classes/MazeGenerator.js';
+import { Skeleton } from '../classes/Enemies/Skeleton.js';
+import { Bat } from '../classes/Enemies/Bat.js';
 
 export class CaveLevel extends Scene {
     constructor() {
@@ -89,7 +91,13 @@ export class CaveLevel extends Scene {
             entryY: this.entryY,
             leaveY: this.leaveY,
             chests: this.chests,
-            enemies: this.enemies
+            enemies: this.enemies.map(e => ({
+                id: e.id,
+                x: e.x,
+                y: e.y,
+                type: e.type,
+                health: e.health,
+            }))
         });
         this.storage.save();
     }
@@ -109,6 +117,7 @@ export class CaveLevel extends Scene {
                 this.openChest(chest, index);
             }
         });
+        this.enemies.forEach(e => e.hitbox.update());
     }
     
     generateObjects() {
@@ -127,7 +136,17 @@ export class CaveLevel extends Scene {
             const x = getRandomInt(0, CHUNKS_X-1);
             const y = getRandomInt(0, CHUNKS_Y-1);
             if (!this.layout[y][x][1]) {
-                this.enemies.push({id: pushed.length, x, y, health: ENEMY_HEALTH, hitbox: null});
+                let type = 'bat';
+                const level = this.number;
+                if (level > 3) {
+                    type = 'skeleton';
+                }
+                this.enemies.push({
+                    id: pushed.length,
+                    x, y,
+                    type: type, 
+                    hitbox: null
+                });
                 pushed.push(`${x}-${y}`);
             }
         }
@@ -178,14 +197,27 @@ export class CaveLevel extends Scene {
     }
 
     spawnEnemies() {
-        this.enemies.forEach((enemy, index) => {
-            const posX = enemy.x*TILE_SIZE_X*CHUNK_SIZE+(TILE_SIZE_X*2);
-            const posY = enemy.y*TILE_SIZE_Y*CHUNK_SIZE+(TILE_SIZE_Y*(CHUNK_SIZE-1));
-            const hitbox = this.physics.add.sprite(posX, posY, 'skeleton')
-                .setOrigin(0.5, 1)
-                .refreshBody();
-            hitbox.setCollideWorldBounds(true);
-            this.enemies[index].hitbox = hitbox;
+        this.enemies.forEach((enemyData, index) => {
+            const posX = enemyData.x * TILE_SIZE_X * CHUNK_SIZE + (TILE_SIZE_X * 2);
+            const posY = enemyData.y * TILE_SIZE_Y * CHUNK_SIZE + (TILE_SIZE_Y * (CHUNK_SIZE - 1));
+            
+            let enemy;
+            switch (enemyData.type) {
+                case 'skeleton':
+                    enemy = new Skeleton(this, posX, posY);
+                    console.log('Enemy created:', enemy, enemy.x, enemy.y, enemy.visible, enemy.texture.key, enemy.width, enemy.height);
+                    break;
+                case 'bat':
+                    enemy = new Bat(this, posX, posY);
+                    console.log('Enemy created:', enemy, enemy.x, enemy.y, enemy.visible, enemy.texture.key, enemy.width, enemy.height);
+                    break;
+                default:
+                    enemy = new Skeleton(this, posX, posY);
+            }
+            if (enemyData.health) {
+                enemy.hp = enemyData.health;
+            }
+            this.enemies[index].hitbox = enemy;
         });
     }
 

@@ -51,5 +51,21 @@ export function createPlayerAnimations(anims) {
         frameRate: 15,
         // duration: 200,
         repeat: -1
+    });
+}
+
+export function createBatAnimations(anims) {
+    anims.create({
+        key: 'batIdle',
+        frames: anims.generateFrameNumbers('batEnemy', {start: 0, end: 12}),
+        frameRate: 6,
+        repeat: -1
+    });
+
+    anims.create({
+        key: 'batDamaged',
+        frames: anims.generateFrameNumbers('batEnemy', {start: 13, end: 15}),
+        frameRate: 6,
+        repeat: -1
     })
 }

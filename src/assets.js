@@ -148,23 +148,23 @@ export default {
     'spritesheet': {
         player: {
             key: 'person',
-            args: ['assets/Hero1.png', {
+            args: ['assets/sprites/Hero1.png', {
                 frameWidth: 45,
                 frameHeight: 64
             }]
         },
-        playerDash: {
-            key: 'dash',
-            args: ['assets/dashing.png', {
-                frameWidth: 32,
-                frameHeight: 34
-            }]
-        },
-        hero_spear_attack: {
+        heroSpearAttack: {
             key: 'spearAttack',
-            args: ['assets/HeroSpearAttack.png', {
+            args: ['assets/sprites/HeroSpearAttack.png', {
                 frameWidth: 158,
                 frameHeight: 64
+            }]
+        },
+        batEnemy: {
+            key: 'batEnemy',
+            args: ['assets/sprites/Enemies/Bat.png', {
+                frameWidth: 51,
+                frameHeight: 45
             }]
         }
     }

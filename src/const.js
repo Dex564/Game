@@ -21,7 +21,7 @@ export const CHUNK_SIZE = 4;
 export const CHUNKS_X = 10;
 export const CHUNKS_Y = 5;
 export const chestsAttempts = 5;
-export const enemiesAttempts = 5;
+export const enemiesAttempts = 15;
 
 export const hintStyle = {
     fontSize: '20px',
