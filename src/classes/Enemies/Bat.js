@@ -16,7 +16,21 @@ export class Bat extends Enemy {
 
     takeDamage(damage) {
         super.takeDamage(damage)
+        if (!this.active) return;
+
         this.gettingDamaged = true;
+
+        let player = this.scene.player;
+        if (player && player.active) {
+            const angle = Phaser.Math.Angle.Between(player.x, player.y, this.x, this.y);
+            const knockbackSpeed = 350;
+            this.scene.physics.velocityFromAngle(
+                Phaser.Math.RadToDeg(angle),
+                knockbackSpeed,
+                this.body.velocity
+            );
+        }
+
         if (this.hp > 0) this.scene.time.delayedCall(100, () => this.gettingDamaged = false);
         
     }
@@ -29,18 +43,13 @@ export class Bat extends Enemy {
             return;
         }
 
-        if (this.gettingDamaged) {
-            this.setVelocity(0, 0);
-            return;
-        }
-
         const dx = Math.abs(this.x - this.scene.player.x);
         const dy = Math.abs(this.y - this.scene.player.y);
 
         if (dx < 300 && dy < 140) {
-            this.scene.physics.moveToObject(this, player, this.speed);
+            if (!this.gettingDamaged) this.scene.physics.moveToObject(this, player, this.speed);            
         } else {
-            this.setVelocity(0, 0);
+            if (!this.gettingDamaged) this.setVelocity(0, 0);
         }
 
         if (this.body.velocity.x > 0) {
