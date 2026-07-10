@@ -19,6 +19,12 @@ export const ATTACK_HEIGHT = 40;
 export const ATTACK_OFFSET_X = 0;
 export const ATTACK_OFFSET_Y = -30;
 
+export const defaultCoins = 0;
+export const defaultPlayerLevel = 0;
+export const defaultXp = 0;
+export const defaultHealth = 100;
+export const defaultMaxLevel = 1;
+
 // ========== Оружие и зона атаки ==========
 export const WEAPONS = {
     sword: {

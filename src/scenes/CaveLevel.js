@@ -88,7 +88,7 @@ export class CaveLevel extends Scene {
     }
 
     saveLevel() {
-        this.registry.set(`layout-${this.number}`, { 
+        this.storage.save(`layout-${this.number}`, { 
             layout: this.layout,
             entryY: this.entryY,
             leaveY: this.leaveY,
@@ -101,7 +101,6 @@ export class CaveLevel extends Scene {
                 health: e.health,
             }))
         });
-        this.storage.save();
     }
     
     update() {
@@ -304,7 +303,7 @@ export class CaveLevel extends Scene {
                 this.registry.set(`lastAction`, 'leave');
                 this.registry.set(`currentLevel`, this.number+1);
                 this.registry.set(`maxLevel`, this.number+1);
-                this.storage.save();
+                this.storage.saveAll();
                 this.scene.restart();
             }
         });

@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 import * as Const from '../const.js';
 import { getRandomInt } from '../utils.js';
+import { Storage } from '../classes/Storage.js';
 
 export class PlayerClass {
     constructor(scene, worldX = Const.WIDTH, worldY = Const.HEIGHT) {
@@ -34,6 +35,8 @@ export class PlayerClass {
         this.coyoteDuration = Const.COYOTE_DURATION;
         this._lastTime = 0;
 
+        this.storage = new Storage(this.scene.registry);
+
         // Параметры плавного движения
         this.acceleration = 2500;
         this.drag = 2000;
@@ -41,14 +44,13 @@ export class PlayerClass {
         this.maxSpeedAir = Const.MOVE_SPEED_AIR;
 
         // Комбат
-        this.hp = 100;
+        this.hp = this.scene.registry.get('health') ?? Const.defaultHealth;
         this.invincible = false;
         this.invincibleDuration = 450; // мс неуязвимости после удара
         this.invincibleTimer = 0;
 
-        this.xp = 0;
-        this.level = 0;
-        this.healthPoints = 100;
+        this.xp = this.scene.registry.get('xp') ?? Const.defaultXp;
+        this.level = this.scene.registry.get('playerLevel') ?? Const.defaultPlayerLevel;
 
         // Текущее оружие и его параметры
         this.currentWeapon = null;
@@ -418,6 +420,9 @@ export class PlayerClass {
 
     levelUp() {
         console.log(`Current level: ${this.level}, current xp : ${this.xp}`);
+        this.storage.save('xp', this.xp);
+        this.storage.save('playerLevel', this.level);
+        
     }
     
     // --- ПОЛУЧЕНИЕ УРОНА --- //
@@ -438,6 +443,7 @@ export class PlayerClass {
         }
 
         console.log(`Player HP: ${this.hp}`);
+        this.storage.save('health', this.hp);
 
         this.scene.time.delayedCall(this.invincibleDuration, () => {
             this.invincible = false;

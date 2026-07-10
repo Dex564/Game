@@ -149,7 +149,7 @@ export class InsideTemple extends Scene {
         }
         this.registry.set('maxLevel', 1);
         this.registry.set('currentLevel', 1);
-        this.storage.save();
+        this.storage.saveAll();
         this.changeScene('CaveLevel');
     }
 
@@ -163,7 +163,7 @@ export class InsideTemple extends Scene {
         }
         this.registry.inc('coins', -(this.requiredCoins));
         this.registry.set('currentLevel', this.maxLevel);
-        this.storage.save();
+        this.storage.saveAll();
         this.changeScene('CaveLevel');
     }
 }
