@@ -7,6 +7,8 @@ export class Bat extends Enemy {
         this.speed = 120;
         
         this.gettingDamaged = false;
+        this.damage = 5;
+        this.xp = 60;
     }
 
     update() {
@@ -23,7 +25,7 @@ export class Bat extends Enemy {
         let player = this.scene.player;
         if (player && player.active) {
             const angle = Phaser.Math.Angle.Between(player.x, player.y, this.x, this.y);
-            const knockbackSpeed = 350;
+            const knockbackSpeed = 650;
             this.scene.physics.velocityFromAngle(
                 Phaser.Math.RadToDeg(angle),
                 knockbackSpeed,

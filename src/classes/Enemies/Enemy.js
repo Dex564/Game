@@ -11,6 +11,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.setBounce(0.1);
         this.setDepth(105);
         this.hp = 1;
+        this.justDied = false;
+        this.xp = 0;
     }
 
     // Общий метод получения урона – может быть переопределён в наследниках
@@ -19,6 +21,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.hp -= damage;
         console.log(`${this.constructor.name} HP:`, this.hp);
         if (this.hp <= 0) {
+            this.justDied = true;
+            this.scene.time.delayedCall(100, () => this.justDied = false);
             this.destroy();
         }
     }

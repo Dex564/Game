@@ -42,10 +42,16 @@ export class PlayerClass {
 
         // Комбат
         this.baseDamage = 10;
+        this.hp = 100;
+        this.xp = 0;
+        this.level = 0;
         this.playerDamage = this.baseDamage;
         this.healthPoints = 100;
         this.attackRange = 90;
         this.attackHeight = 40;
+
+        // Пассивки
+        this.xpModifier = 1;
     }
 
     /* --------------------------------------------------------------
@@ -334,8 +340,27 @@ export class PlayerClass {
             const dy = enemy.y - playerY;
             if (dx * dir > 0 && Math.abs(dx) < this.attackRange && Math.abs(dy) < this.attackHeight) {
                 enemy.takeDamage(this.playerDamage);
+                if (enemy.justDied) {
+                    this.xp += enemy.xp * this.xpModifier;
+                    this.calculatePlayerLevel();
+                }
             }
         }
+    }
+
+    // --- УРОВЕНЬ ИГРОКА --- //
+    calculatePlayerLevel() {
+        const xpNeeded = this.level * 10 + 100;
+        if (this.xp >= xpNeeded) {
+            this.level += 1;
+            this.xp -= xpNeeded;
+        }
+        this.levelUp();
+    }
+
+    levelUp() {
+        console.log(this.xp)
+        console.log(this.level)
     }
 
     // --- АНИМАЦИИ --- //
