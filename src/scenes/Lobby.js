@@ -67,7 +67,7 @@ export class Lobby extends Scene {
         this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.stop('HUD');
             this.scene.stop('Lobby');
-            this.scene.start('InsideTemple');
+            this.scene.start('InsideTemple', 'fromLobby');
         });
     }
 }

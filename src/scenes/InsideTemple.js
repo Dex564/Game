@@ -10,7 +10,7 @@ export class InsideTemple extends Scene {
         this.worldY = HEIGHT/2;
     }
     
-    create() {
+    create(data) {
         this.storage = new Storage(this.registry);
 
         this.entering = false;
@@ -25,7 +25,11 @@ export class InsideTemple extends Scene {
         this.player = this.playerHandler.createPlayer();
         this.physics.world.setBounds(0, 0, this.worldX, this.worldY);
 
-        this.playerHandler.setPlayerPosition(this.worldX - 100, this.worldY - 65);
+        if (data === 'fromCave') {
+            this.playerHandler.setPlayerPosition(512+64, this.worldY - 65);
+        } else {
+            this.playerHandler.setPlayerPosition(this.worldX - 100, this.worldY - 65);
+        }
 
         this.drawGround();
 

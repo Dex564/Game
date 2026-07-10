@@ -277,7 +277,7 @@ export class CaveLevel extends Scene {
                     this.registry.set(`lastAction`, 'leave');
                     this.registry.set(`currentLevel`, 1);
                     this.scene.stop('CaveLevel');
-                    this.scene.start('Lobby');
+                    this.scene.start('InsideTemple', 'fromCave');
                 } else {
                     this.registry.set(`lastAction`, 'entry');
                     this.registry.set(`currentLevel`, this.number-1);

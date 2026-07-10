@@ -23,7 +23,15 @@ export class Pause extends Scene {
             this.scene.stop('Pause');
         }).setOrigin(0.5, 0);
         
-        if (parentLevel == 'CaveLevel' || parentLevel == 'InsideTemple') {
+        if (parentLevel == 'CaveLevel') {
+            this.add.image(WIDTH/2, HEIGHT/2, 'lobby_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
+                this.registry.set(`lastAction`, 'leave');
+                this.scene.stop(parentLevel);
+                this.scene.stop('HUD');
+                this.scene.start('InsideTemple', 'fromCave');
+                this.scene.stop('Pause');
+            }).setOrigin(0.5, 0);
+        } else if (parentLevel == 'InsideTemple') {
             this.add.image(WIDTH/2, HEIGHT/2, 'lobby_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
                 this.registry.set(`lastAction`, 'leave');
                 this.scene.stop(parentLevel);
