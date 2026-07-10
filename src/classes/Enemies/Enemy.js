@@ -13,6 +13,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.hp = 1;
         this.justDied = false;
         this.xp = 0;
+        this.knockbackSpeed = 0;
     }
 
     // Общий метод получения урона – может быть переопределён в наследниках
@@ -29,6 +30,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     // Метод для удаления врага из массива сцены
     destroy() {
+        if (this.scene && this.scene.enemiesGroup) {
+            this.scene.enemiesGroup.remove(this);
+        }
+
         if (this.scene && this.scene.enemies) {
             const index = this.scene.enemies.findIndex(e => e.hitbox === this);
             if (index !== -1) {

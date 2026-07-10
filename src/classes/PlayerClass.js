@@ -42,6 +42,10 @@ export class PlayerClass {
 
         // Комбат
         this.hp = 100;
+        this.invincible = false;
+        this.invincibleDuration = 450; // мс неуязвимости после удара
+        this.invincibleTimer = 0;
+
         this.xp = 0;
         this.level = 0;
         this.healthPoints = 100;
@@ -286,12 +290,14 @@ export class PlayerClass {
         if (dashDir === 0) return;
 
         this.player.setFlipX(dashDir === -1);
+        this.invincible = true;
         this.player.setVelocityX(dashDir * Const.DASH_SPEED);
         this.canDash = false;
         this.isDashing = true;
 
         this.scene.time.delayedCall(Const.DASH_DURATION, () => { this.isDashing = false; });
         this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => { this.canDash = true; });
+        this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => { this.invincible = false; });
     }
 
     // --- ВРЕМЯ КОЙОТА --- //
@@ -412,6 +418,34 @@ export class PlayerClass {
 
     levelUp() {
         console.log(`Current level: ${this.level}, current xp : ${this.xp}`);
+    }
+    
+    // --- ПОЛУЧЕНИЕ УРОНА --- //
+    takeDamage(damage, source) {
+        if (this.invincible || !this.player.active) return;
+
+        this.hp -= damage;
+        this.invincible = true;
+
+        // Отбрасывание от источника (врага)
+        if (source) {
+            const angle = Phaser.Math.Angle.Between(source.x, source.y, this.player.x, this.player.y);
+            const knockbackSpeed = source.knockbackSpeed;
+            this.player.setVelocity(
+                Math.cos(angle) * knockbackSpeed,
+                -200
+            );
+        }
+
+        console.log(`Player HP: ${this.hp}`);
+
+        this.scene.time.delayedCall(this.invincibleDuration, () => {
+            this.invincible = false;
+        });
+
+        if (this.hp <= 0) {
+            console.log('Player died');
+        }
     }
 
     // --- АНИМАЦИИ --- //
