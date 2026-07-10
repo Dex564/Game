@@ -2,7 +2,6 @@ import { Scene } from 'phaser';
 import {
     WIDTH,
     HEIGHT,
-    ENEMY_HEALTH,
     hintStyle,
     TILE_SIZE_X,
     TILE_SIZE_Y,

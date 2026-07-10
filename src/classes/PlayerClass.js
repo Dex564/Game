@@ -41,17 +41,25 @@ export class PlayerClass {
         this.maxSpeedAir = Const.MOVE_SPEED_AIR;
 
         // Комбат
-        this.baseDamage = 10;
         this.hp = 100;
         this.xp = 0;
         this.level = 0;
-        this.playerDamage = this.baseDamage;
         this.healthPoints = 100;
-        this.attackRange = 90;
-        this.attackHeight = 40;
+
+        // Текущее оружие и его параметры
+        this.currentWeapon = null;
+        this.playerDamage = 0;
+        this.attackWidth = 0;
+        this.attackHeight = 0;
+        this.attackOffsetX = 0;
+        this.attackOffsetY = 0;
 
         // Пассивки
         this.xpModifier = 1;
+
+        // Графика для отладки зоны атаки
+        this.attackZoneGraphic = null;
+        this.attackDebug = false;
     }
 
     /* --------------------------------------------------------------
@@ -65,17 +73,40 @@ export class PlayerClass {
         );
         this.player.setCollideWorldBounds(true);
         this.player.play('idle');
-
         this.player.setDepth(10);
-
         this.player.setOrigin(0.5, 1);
-
         this.player.setSize(20, 60);
         this.player.setOffset(12, 2);
 
         this.initInput();
         this.createCamera();
+
+        // Графика для визуализации зоны атаки
+        this.attackZoneGraphic = this.scene.add.graphics();
+        this.attackZoneGraphic.setDepth(200);
+        this.attackDebug = this.scene.physics.config.debug;
+
+        this.setWeapon(Const.DEFAULT_WEAPON);
+
         return this.player;
+    }
+
+    /* ----------------------------------------------------------------
+       СМЕНА ОРУЖИЯ
+    ---------------------------------------------------------------- */
+    setWeapon(weaponName) {
+        const cfg = Const.WEAPONS[weaponName];
+        if (!cfg) {
+            console.log(`Оружие "${weaponName}" не найдено в Const.WEAPONS`);
+            return;
+        }
+        this.currentWeapon = weaponName;
+        this.attackWidth = cfg.width;
+        this.attackHeight = cfg.height;
+        this.attackOffsetX = cfg.offsetX;
+        this.attackOffsetY = cfg.offsetY;
+        this.playerDamage = cfg.damage;
+        // смена спрайта оружия, звуков и т.д.
     }
 
     /* ----------------------------------------------------------------
@@ -83,7 +114,6 @@ export class PlayerClass {
     ---------------------------------------------------------------- */
     initInput() {
         const keyboard = this.scene.input.keyboard;
-
         this.keys = keyboard.addKeys({
             up: 'w',
             down: 's',
@@ -98,7 +128,7 @@ export class PlayerClass {
         this.shiftKey = keyboard.addKey('SHIFT');
     }
 
-   /* ----------------------------------------------------------------
+    /* ----------------------------------------------------------------
        КАМЕРА
     ---------------------------------------------------------------- */
     createCamera() {
@@ -121,6 +151,7 @@ export class PlayerClass {
         this.handleAttack();
         this.handleJumpRelease();
         this.updateAnimation();
+        this.drawAttackZone();
     }
 
     // --- СОСТОЯНИЕ ПАДЕНИЯ --- //
@@ -129,7 +160,7 @@ export class PlayerClass {
         this.isFalling = !onGround && this.player.body.velocity.y > 0;
     }
 
-    // --- ДВИЖЕНИЕ ВЛЕВО/ВПРАВО И ПРЫЖОК (с ускорением) --- //
+    // --- ДВИЖЕНИЕ ВЛЕВО/ВПРАВО И ПРЫЖОК --- //
     handleMovement() {
         if (this.isDashing || !this.canControl) return;
 
@@ -138,10 +169,8 @@ export class PlayerClass {
         const jump = this.jumpKey1.isDown || this.jumpKey2.isDown;
         const onGround = this.player.body.onFloor();
 
-        // --- ГОРИЗОНТАЛЬНОЕ ДВИЖЕНИЕ --- //
         let targetSpeed = 0;
         const maxSpeed = onGround ? this.maxSpeedGround : this.maxSpeedAir;
-
         if (left && !right) {
             targetSpeed = -maxSpeed;
             this.player.setFlipX(true);
@@ -153,7 +182,6 @@ export class PlayerClass {
         // Плавное ускорение/торможение
         const accel = this.acceleration * 0.016;
         const drag = this.drag * 0.032;
-
         if (targetSpeed !== 0) {
             const diff = targetSpeed - this.player.body.velocity.x;
             if (Math.abs(diff) < accel) {
@@ -164,9 +192,7 @@ export class PlayerClass {
             if (onGround && !this.walkSound) {
                 this.walkSound = true;
                 this.scene.sound.play(`step${getRandomInt(1, 5)}`);
-                this.scene.time.delayedCall(500, () => {
-                    this.walkSound = false;
-                });
+                this.scene.time.delayedCall(500, () => { this.walkSound = false; });
             }
         } else {
             if (Math.abs(this.player.body.velocity.x) < drag) {
@@ -177,14 +203,11 @@ export class PlayerClass {
             }
         }
 
-        // --- ПРЫЖОК --- //
         if (jump && (onGround || this.coyoteTimer > 0)) {
             if (!this.jumpSound) {
                 this.jumpSound = true;
                 this.scene.sound.play(`jump${getRandomInt(1, 2)}`);
-                this.scene.time.delayedCall(500, () => {
-                    this.jumpSound = false;
-                });
+                this.scene.time.delayedCall(500, () => { this.jumpSound = false; });
             }
             this.player.setVelocityY(Const.JUMP_SPEED);
             this.coyoteTimer = 0;
@@ -228,7 +251,7 @@ export class PlayerClass {
     // --- ОТСКОК ОТ СТЕНЫ --- //
     performWallJump(side) {
         const isRight = side === 'right';
-        let speed = Const.MOVE_SPEED_AIR - 100
+        let speed = Const.MOVE_SPEED_AIR - 100;
         const wallJumpSpeed = isRight ? speed : -speed;
 
         this.player.x += isRight ? 6 : -6;
@@ -240,10 +263,7 @@ export class PlayerClass {
         if (isRight) this.wallJumpRight = false;
         else this.wallJumpLeft = false;
 
-        this.scene.time.delayedCall(300, () => {
-            // this.player.setVelocityX(0);
-            this.canControl = true;
-        });
+        this.scene.time.delayedCall(300, () => { this.canControl = true; });
         this.scene.time.delayedCall(1180, () => {
             if (isRight) this.wallJumpRight = true;
             else this.wallJumpLeft = true;
@@ -263,30 +283,20 @@ export class PlayerClass {
         let dashDir = 0;
         if (this.keys.right.isDown && !this.keys.left.isDown) dashDir = 1;
         else if (this.keys.left.isDown && !this.keys.right.isDown) dashDir = -1;
+        if (dashDir === 0) return;
 
-        if (dashDir === 0){
-            return;    
-        } else if (dashDir == 1) {
-            this.player.setFlipX(false);
-        } else {
-            this.player.setFlipX(true);
-        }
+        this.player.setFlipX(dashDir === -1);
         this.player.setVelocityX(dashDir * Const.DASH_SPEED);
         this.canDash = false;
         this.isDashing = true;
 
-        this.scene.time.delayedCall(Const.DASH_DURATION, () => {
-            this.isDashing = false;
-        });
-        this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => {
-            this.canDash = true;
-        });
+        this.scene.time.delayedCall(Const.DASH_DURATION, () => { this.isDashing = false; });
+        this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => { this.canDash = true; });
     }
 
-    // --- ВРЕМЯ КОЙОТА (ПОБЛАЖКА ДЛЯ ПРЫЖКА) --- //
+    // --- ВРЕМЯ КОЙОТА --- //
     updateCoyoteTimer() {
         const onGround = this.player.body.onFloor();
-
         if (onGround) {
             this.coyoteTimer = this.coyoteDuration;
             this._lastTime = this.scene.time.now;
@@ -329,16 +339,31 @@ export class PlayerClass {
     performAttack() {
         if (!this.scene.enemies || !Array.isArray(this.scene.enemies)) return;
 
-        const playerX = this.player.x;
-        const playerY = this.player.y - 30;
         const dir = this.player.flipX ? -1 : 1;
+        let zoneLeft, zoneRight;
+        if (dir === 1) {
+            zoneLeft = this.player.x + this.attackOffsetX;
+            zoneRight = zoneLeft + this.attackWidth;
+        } else {
+            zoneRight = this.player.x - this.attackOffsetX;
+            zoneLeft = zoneRight - this.attackWidth;
+        }
+        const zoneCenterY = this.player.y + this.attackOffsetY;
+        const zoneTop = zoneCenterY - this.attackHeight;
+        const zoneBottom = zoneCenterY + this.attackHeight;
 
         for (let enemyData of this.scene.enemies) {
             const enemy = enemyData.hitbox;
             if (!enemy || !enemy.active) continue;
-            const dx = enemy.x - playerX;
-            const dy = enemy.y - playerY;
-            if (dx * dir > 0 && Math.abs(dx) < this.attackRange && Math.abs(dy) < this.attackHeight) {
+
+            const bounds = enemy.getBounds();
+            const enemyLeft = bounds.x;
+            const enemyRight = bounds.x + bounds.width;
+            const enemyTop = bounds.y;
+            const enemyBottom = bounds.y + bounds.height;
+
+            if (zoneLeft < enemyRight && zoneRight > enemyLeft &&
+                zoneTop < enemyBottom && zoneBottom > enemyTop) {
                 enemy.takeDamage(this.playerDamage);
                 if (enemy.justDied) {
                     this.xp += enemy.xp * this.xpModifier;
@@ -346,6 +371,33 @@ export class PlayerClass {
                 }
             }
         }
+    }
+
+    // --- ОТРИСОВКА ЗОНЫ АТАКИ (только при debug: true) --- //
+    drawAttackZone() {
+        if (!this.attackZoneGraphic || !this.attackDebug) {
+            if (this.attackZoneGraphic) this.attackZoneGraphic.clear();
+            return;
+        }
+
+        const dir = this.player.flipX ? -1 : 1;
+        const w = this.attackWidth;
+        const fullH = this.attackHeight * 2;          // полная высота прямоугольника
+        const zoneCenterY = this.player.y + this.attackOffsetY;
+
+        let rectX;
+        if (dir === 1) {
+            rectX = this.player.x + this.attackOffsetX;
+        } else {
+            rectX = this.player.x - this.attackOffsetX - w;
+        }
+        const rectY = zoneCenterY - fullH / 2;
+
+        this.attackZoneGraphic.clear();
+        this.attackZoneGraphic.fillStyle(0xff0000, 0.2);
+        this.attackZoneGraphic.fillRect(rectX, rectY, w, fullH);
+        this.attackZoneGraphic.lineStyle(2, 0xff0000, 0.8);
+        this.attackZoneGraphic.strokeRect(rectX, rectY, w, fullH);
     }
 
     // --- УРОВЕНЬ ИГРОКА --- //
@@ -359,13 +411,11 @@ export class PlayerClass {
     }
 
     levelUp() {
-        console.log(this.xp)
-        console.log(this.level)
+        console.log(`Current level: ${this.level}, current xp : ${this.xp}`);
     }
 
     // --- АНИМАЦИИ --- //
     updateAnimation() {
-        // Приоритет: рывок > атака > земные/воздушные
         if (this.isDashing) {
             this.player.play('dash', true);
             return;
@@ -375,12 +425,13 @@ export class PlayerClass {
             if (this.player.anims.currentAnim?.key !== 'spearAttack') {
                 this.player.setOffset(70, 2);
                 this.player.play('spearAttack', true);
-            } 
+            }
             return;
-        } else this.player.setOffset(12, 2);
+        } else {
+            this.player.setOffset(12, 2);
+        }
 
         const onGround = this.player.body.blocked.down || this.player.body.touching.down;
-
         if (onGround) {
             const standing = (!this.keys.left.isDown && !this.keys.right.isDown) ||
                              (this.keys.left.isDown && this.keys.right.isDown);
@@ -390,9 +441,7 @@ export class PlayerClass {
             } else {
                 if (!this.isRunning) {
                     this.player.play('startrun', true);
-                    this.scene.time.delayedCall(100, () => {
-                        this.isRunning = true;
-                    });
+                    this.scene.time.delayedCall(100, () => { this.isRunning = true; });
                 } else {
                     this.player.play('run', true);
                 }
