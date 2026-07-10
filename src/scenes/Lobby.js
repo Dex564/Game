@@ -8,6 +8,11 @@ export class Lobby extends Scene {
     }
 
     create() {
+        const health = this.registry.get('health');
+        if (health <= 0) {
+            this.scene.stop('Lobby');
+            this.scene.start('GameOver');
+        }
         this.scene.launch('HUD', 'Lobby');
         this.add.image(0, 0, 'background').setOrigin(0);
         this.playerHandler = new PlayerClass(this);

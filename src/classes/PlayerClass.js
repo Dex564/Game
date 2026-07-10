@@ -434,6 +434,8 @@ export class PlayerClass {
         this.hp -= damage;
         this.invincible = true;
 
+        this.eventManager.emit('playerAttacked');
+
         // Отбрасывание от источника (врага)
         if (source) {
             const angle = Phaser.Math.Angle.Between(source.x, source.y, this.player.x, this.player.y);

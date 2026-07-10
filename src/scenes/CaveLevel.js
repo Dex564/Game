@@ -9,7 +9,8 @@ import {
     CHUNKS_X,
     CHUNKS_Y,
     chestsAttempts,
-    enemiesAttempts
+    enemiesAttempts,
+    COMBAT_TIME
 } from '../const.js';
 import { PlayerClass } from "../classes/PlayerClass.js";
 import { getRandomInt, generateChunk } from "../utils.js";
@@ -81,7 +82,10 @@ export class CaveLevel extends Scene {
         this.createEntryHitbox();
         this.createLeaveHitbox();
 
+        this.inCombat = false;
+
         this.input.keyboard.on('keydown', (key) => {
+            if (this.inCombat) return;
             if (key.code == 'Escape') {
                 this.scene.launch('Pause', 'CaveLevel');
                 this.scene.pause('CaveLevel');
@@ -99,6 +103,13 @@ export class CaveLevel extends Scene {
                 onUpdate: (progress) => {
                     this.cameras.main.setAlpha(1 - progress);
                 }
+            });
+        });
+
+        this.eventManager.on('playerAttacked', () => {
+            this.inCombat = true;
+            this.time.delayedCall(COMBAT_TIME, () => {
+                this.inCombat = false;
             });
         });
     }

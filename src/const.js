@@ -19,6 +19,8 @@ export const ATTACK_HEIGHT = 40;
 export const ATTACK_OFFSET_X = 0;
 export const ATTACK_OFFSET_Y = -30;
 
+export const COMBAT_TIME = 2500;
+
 export const defaultCoins = 0;
 export const defaultPlayerLevel = 0;
 export const defaultXp = 0;
