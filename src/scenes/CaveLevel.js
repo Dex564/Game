@@ -69,6 +69,9 @@ export class CaveLevel extends Scene {
             this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             console.log(`Generated room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         }
+
+        this.enemiesGroup = this.physics.add.group({ runChildUpdate: false });
+
         this.drawRoom(this.layout);
         this.drawChests();
         this.spawnEnemies();
@@ -216,6 +219,7 @@ export class CaveLevel extends Scene {
             if (enemyData.health) {
                 enemy.hp = enemyData.health;
             }
+            this.enemiesGroup.add(enemy);
             this.enemies[index].hitbox = enemy;
         });
     }
@@ -240,6 +244,19 @@ export class CaveLevel extends Scene {
         this.enemies.forEach((enemy) => {
             this.physics.add.collider(enemy.hitbox, this.layer);
         });
+        this.physics.add.overlap(
+            this.player,
+            this.enemiesGroup,
+            this.onPlayerTouchEnemy,
+            null,
+            this
+        );
+    }
+
+    onPlayerTouchEnemy(player, enemy) {
+        if (player.active && enemy.active && !this.playerHandler.invincible) {
+            this.playerHandler.takeDamage(enemy.damage, enemy);
+        }
     }
 
     createEntryHitbox() {
