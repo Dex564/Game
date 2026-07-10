@@ -26,7 +26,7 @@ export class Storage {
 
     save(key, value) {
         this.registry.set(key, value);
-        localStorage.setItem(key, value);
+        localStorage.setItem(key, JSON.stringify(value));
     }
     
     load() {

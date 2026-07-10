@@ -17,10 +17,12 @@ import { Storage } from '../classes/Storage.js';
 import { MazeGenerator } from '../classes/MazeGenerator.js';
 import { Skeleton } from '../classes/Enemies/Skeleton.js';
 import { Bat } from '../classes/Enemies/Bat.js';
+import { EventManager } from '../classes/EventManager.js';
 
 export class CaveLevel extends Scene {
     constructor() {
         super('CaveLevel');
+        this.eventManager = EventManager.getInstance();
     }
     
     create() {
@@ -84,6 +86,20 @@ export class CaveLevel extends Scene {
                 this.scene.launch('Pause', 'CaveLevel');
                 this.scene.pause('CaveLevel');
             }
+        });
+
+        this.eventManager.on('playerDead', () => {
+            console.log('playerDead event');
+            this.scene.pause('CaveLevel');
+            this.scene.stop('HUD');
+            this.scene.transition({
+                target: 'GameOver',
+                duration: 1000,
+                moveBelow: true,
+                onUpdate: (progress) => {
+                    this.cameras.main.setAlpha(1 - progress);
+                }
+            });
         });
     }
 
@@ -206,11 +222,11 @@ export class CaveLevel extends Scene {
             switch (enemyData.type) {
                 case 'skeleton':
                     enemy = new Skeleton(this, posX, posY);
-                    console.log('Enemy created:', enemy, enemy.x, enemy.y, enemy.visible, enemy.texture.key, enemy.width, enemy.height);
+                    // console.log('Enemy created:', enemy, enemy.x, enemy.y, enemy.visible, enemy.texture.key, enemy.width, enemy.height);
                     break;
                 case 'bat':
                     enemy = new Bat(this, posX, posY);
-                    console.log('Enemy created:', enemy, enemy.x, enemy.y, enemy.visible, enemy.texture.key, enemy.width, enemy.height);
+                    // console.log('Enemy created:', enemy, enemy.x, enemy.y, enemy.visible, enemy.texture.key, enemy.width, enemy.height);
                     break;
                 default:
                     enemy = new Skeleton(this, posX, posY);

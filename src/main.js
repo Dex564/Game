@@ -6,6 +6,7 @@ import { Preloader } from './scenes/Preloader';
 import { HUD } from './scenes/HUD';
 import { Pause } from './scenes/Pause';
 import { InsideTemple } from './scenes/InsideTemple';
+import { GameOver } from './scenes/GameOver';
 import * as Phaser from 'phaser';
 import * as Const from './const';
 
@@ -36,6 +37,7 @@ const config = {
         CaveLevel,
         HUD,
         Pause,
+        GameOver
     ]
 };
 

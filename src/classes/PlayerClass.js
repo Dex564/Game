@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import * as Const from '../const.js';
 import { getRandomInt } from '../utils.js';
 import { Storage } from '../classes/Storage.js';
+import { EventManager } from './EventManager.js';
 
 export class PlayerClass {
     constructor(scene, worldX = Const.WIDTH, worldY = Const.HEIGHT) {
@@ -36,6 +37,7 @@ export class PlayerClass {
         this._lastTime = 0;
 
         this.storage = new Storage(this.scene.registry);
+        this.eventManager = EventManager.getInstance();
 
         // Параметры плавного движения
         this.acceleration = 2500;
@@ -451,6 +453,7 @@ export class PlayerClass {
 
         if (this.hp <= 0) {
             console.log('Player died');
+            this.eventManager.emit('playerDead');
         }
     }
 
