@@ -42,7 +42,7 @@ export class Bat extends Enemy {
         const player = this.scene.player;
 
         if (!player || !player.active) {
-            this.setVelocity(0, 0);
+            this.setVelocity(0, -50);
             return;
         }
 
@@ -52,7 +52,7 @@ export class Bat extends Enemy {
         if (dx < 300 && dy < 140) {
             if (!this.gettingDamaged) this.scene.physics.moveToObject(this, player, this.speed);            
         } else {
-            if (!this.gettingDamaged) this.setVelocity(0, 0);
+            if (!this.gettingDamaged) this.setVelocity(0, -50);
         }
 
         if (this.body.velocity.x > 0) {

@@ -227,7 +227,7 @@ export class CaveLevel extends Scene {
     spawnEnemies() {
         this.enemies.forEach((enemyData, index) => {
             const posX = enemyData.x * TILE_SIZE_X * CHUNK_SIZE + (TILE_SIZE_X * 2);
-            const posY = enemyData.y * TILE_SIZE_Y * CHUNK_SIZE + (TILE_SIZE_Y * (CHUNK_SIZE - 1));
+            const posY = enemyData.y * TILE_SIZE_Y * CHUNK_SIZE + (TILE_SIZE_Y * (CHUNK_SIZE - 2));
             
             let enemy;
             switch (enemyData.type) {
