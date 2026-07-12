@@ -54,7 +54,7 @@ export default {
     'image': {
         background: {
             key: 'background',
-            args: ['assets/bg.png']
+            args: ['assets/259126.jpg']
         },
         bgcave: {
             key: 'bgcave',
