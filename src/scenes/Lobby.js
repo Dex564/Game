@@ -5,11 +5,11 @@ import { Scene, Input, Geom } from "phaser";
 export class Lobby extends Scene {
     constructor() {
         super('Lobby');
-        this.entering = false;
-        this.opening = false;
     }
 
     create() {
+        this.entering = false;
+        this.opening = false;
         const health = this.registry.get('health');
         if (health <= 0) {
             this.scene.stop('Lobby');
