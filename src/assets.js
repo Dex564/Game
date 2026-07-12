@@ -143,6 +143,14 @@ export default {
         skeleton: {
             key: 'skeleton',
             args: ['assets/skeleton.png']
+        },
+        altar: {
+            key: 'altar',
+            args: ['assets/altar.png']
+        },
+        shop: {
+            key: 'shop',
+            args: ['assets/shop.png']
         }
     },
     'spritesheet': {
