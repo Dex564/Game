@@ -10,15 +10,18 @@ export class Bat extends Enemy {
         this.gettingDamaged = false;
         this.damage = 5;
         this.knockbackSpeed = 650;
+
+        this.wanderDirection = Phaser.Math.Between(0, 1) ? 1 : -1;
+        this.nextWanderChange = 0
     }
 
     update() {
-        this.moveTowardsPlayer()
+        this.wander();
         this.updateAnims();
     }
 
     takeDamage(damage) {
-        super.takeDamage(damage)
+        super.takeDamage(damage);
         if (!this.active) return;
 
         this.gettingDamaged = true;
@@ -34,32 +37,60 @@ export class Bat extends Enemy {
             );
         }
 
-        if (this.hp > 0) this.scene.time.delayedCall(100, () => this.gettingDamaged = false);
-        
+        if (this.hp > 0) {
+            this.scene.time.delayedCall(100, () => {
+                this.gettingDamaged = false;
+            });
+        }
     }
 
-    moveTowardsPlayer() {
-        const player = this.scene.player;
+    wander() {
+        if (this.gettingDamaged) return;
 
-        if (!player || !player.active) {
-            this.setVelocity(0, -50);
+        const player = this.scene.player;
+        if (player && player.active) {
+            const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
+            if (dist < 200) {
+                if (dist < 30) {
+                    this.setVelocity(0, 0);
+                } else {
+                    this.scene.physics.moveToObject(this, player, this.speed);
+                }
+                return;
+            }
+        }
+
+        const now = this.scene.time.now;
+
+        if (now >= this.nextWanderChange) {
+            if (Phaser.Math.Between(0, 1)) {
+                this.setVelocityX(0);
+                this.nextWanderChange = now + Phaser.Math.Between(500, 2000);
+            } else {
+                this.wanderDirection = Phaser.Math.Between(0, 1) ? 1 : -1;
+                this.setVelocityX(this.speed * this.wanderDirection);
+                this.nextWanderChange = now + Phaser.Math.Between(1000, 3000);
+            }
             return;
         }
 
-        const dx = Math.abs(this.x - this.scene.player.x);
-        const dy = Math.abs(this.y - this.scene.player.y);
-
-        if (dx < 300 && dy < 140) {
-            if (!this.gettingDamaged) this.scene.physics.moveToObject(this, player, this.speed);            
-        } else {
-            if (!this.gettingDamaged) this.setVelocity(0, -50);
+        if (Math.abs(this.body.velocity.x) > 0 && this.isAtEdge()) {
+            this.wanderDirection *= -1;
+            this.setVelocityX(this.speed * this.wanderDirection);
+            this.nextWanderChange = now + Phaser.Math.Between(1000, 2000);
         }
+    }
 
-        if (this.body.velocity.x > 0) {
-            this.setFlipX(true);
-        } else if (this.body.velocity.x < 0) {
-            this.setFlipX(false);
-        }
+    isAtEdge() {
+        const layer = this.scene.layer;
+        if (!layer) return false;
+
+        const dir = this.wanderDirection;
+        const checkX = this.x + (this.body.halfWidth + 10) * dir;
+        const checkY = this.y + this.body.halfHeight + 5;
+
+        const tile = layer.getTileAtWorldXY(checkX, checkY);
+        return !tile;
     }
 
     updateAnims() {
@@ -69,6 +100,12 @@ export class Bat extends Enemy {
             }
         } else if (this.gettingDamaged){
             this.play('batDamaged');
+        }
+
+        if (this.body.velocity.x > 0) {
+            this.setFlipX(true);
+        } else if (this.body.velocity.x < 0) {
+            this.setFlipX(false);
         }
     }
 }
