@@ -143,6 +143,18 @@ export default {
         skeleton: {
             key: 'skeleton',
             args: ['assets/skeleton.png']
+        },
+        cardTenMaxHp: {
+            key: 'CardTenMaxHp',
+            args: ['assets/playerUpgrades/cards/cardTenMaxHp.png']
+        },
+        cardDoubleCoins: {
+            key: 'CardDoubleCoins',
+            args: ['assets/playerUpgrades/cards/cardDoubleCoins.png']
+        },
+        cardDoubleDamage: {
+            key: 'CardDoubleDamage',
+            args: ['assets/playerUpgrades/cards/doubleDamageCard.png']
         }
     },
     'spritesheet': {

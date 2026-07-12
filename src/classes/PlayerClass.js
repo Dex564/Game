@@ -3,6 +3,7 @@ import * as Const from '../const.js';
 import { getRandomInt } from '../utils.js';
 import { Storage } from '../classes/Storage.js';
 import { EventManager } from './EventManager.js';
+import { LevelUpScene } from '../scenes/upgrades/LevelUp.js';
 
 export class PlayerClass {
     constructor(scene, worldX = Const.WIDTH, worldY = Const.HEIGHT) {
@@ -46,9 +47,12 @@ export class PlayerClass {
         this.maxSpeedAir = Const.MOVE_SPEED_AIR;
 
         // Комбат
-        this.hp = this.scene.registry.get('health') ?? Const.defaultHealth;
+        this.maxHp = this.scene.registry.get('maxHp') ?? Const.defaultHealth;
+        this.storage.save('maxHp', this.maxHp);
+        this.hp = this.scene.registry.get('health') ?? this.maxHp;
+
         this.invincible = false;
-        this.invincibleDuration = 450; // мс неуязвимости после удара
+        this.invincibleDuration = 450;
         this.invincibleTimer = 0;
 
         this.xp = this.scene.registry.get('xp') ?? Const.defaultXp;
@@ -64,6 +68,9 @@ export class PlayerClass {
 
         // Пассивки
         this.xpModifier = 1;
+        this.coinMultiplier = this.scene.registry.get('coinMultiplier') ?? 1;
+        this.damageMultiplier = this.scene.registry.get('damageMultiplier') ?? 1;
+        this.baseCoinsIncrease = 0;
 
         // Графика для отладки зоны атаки
         this.attackZoneGraphic = null;
@@ -349,6 +356,7 @@ export class PlayerClass {
     performAttack() {
         if (!this.scene.enemies || !Array.isArray(this.scene.enemies)) return;
 
+        const effectiveDamage = this.playerDamage * this.damageMultiplier;
         const dir = this.player.flipX ? -1 : 1;
         let zoneLeft, zoneRight;
         if (dir === 1) {
@@ -374,40 +382,14 @@ export class PlayerClass {
 
             if (zoneLeft < enemyRight && zoneRight > enemyLeft &&
                 zoneTop < enemyBottom && zoneBottom > enemyTop) {
-                enemy.takeDamage(this.playerDamage);
+                enemy.takeDamage(effectiveDamage);
                 if (enemy.justDied) {
                     this.xp += enemy.xp * this.xpModifier;
+                    this.storage.save('xp', this.xp)
                     this.calculatePlayerLevel();
                 }
             }
         }
-    }
-
-    // --- ОТРИСОВКА ЗОНЫ АТАКИ (только при debug: true) --- //
-    drawAttackZone() {
-        if (!this.attackZoneGraphic || !this.attackDebug) {
-            if (this.attackZoneGraphic) this.attackZoneGraphic.clear();
-            return;
-        }
-
-        const dir = this.player.flipX ? -1 : 1;
-        const w = this.attackWidth;
-        const fullH = this.attackHeight * 2;          // полная высота прямоугольника
-        const zoneCenterY = this.player.y + this.attackOffsetY;
-
-        let rectX;
-        if (dir === 1) {
-            rectX = this.player.x + this.attackOffsetX;
-        } else {
-            rectX = this.player.x - this.attackOffsetX - w;
-        }
-        const rectY = zoneCenterY - fullH / 2;
-
-        this.attackZoneGraphic.clear();
-        this.attackZoneGraphic.fillStyle(0xff0000, 0.2);
-        this.attackZoneGraphic.fillRect(rectX, rectY, w, fullH);
-        this.attackZoneGraphic.lineStyle(2, 0xff0000, 0.8);
-        this.attackZoneGraphic.strokeRect(rectX, rectY, w, fullH);
     }
 
     // --- УРОВЕНЬ ИГРОКА --- //
@@ -416,15 +398,28 @@ export class PlayerClass {
         if (this.xp >= xpNeeded) {
             this.level += 1;
             this.xp -= xpNeeded;
+            this.levelUp();
         }
-        this.levelUp();
     }
 
     levelUp() {
-        console.log(`Current level: ${this.level}, current xp : ${this.xp}`);
+        console.log(`Level up! Level: ${this.level}, XP: ${this.xp}`);
         this.storage.save('xp', this.xp);
         this.storage.save('playerLevel', this.level);
-        
+
+        const mainScene = this.scene;
+        mainScene.scene.pause();
+        this.canControl = false;
+        this.canDash = false;
+        this.invincible = true;
+
+        mainScene.scene.launch('LevelUp', { player: this, parentScene: this.scene.sys.settings.key });
+    }
+
+    // --- ПОЛУЧЕНИЕ МОНЕТ --- //
+    getCoins(coins) {
+        let coinsGained = (coins + this.baseCoinsIncrease) * this.coinMultiplier;
+        this.storage.inc('coins', coinsGained);
     }
     
     // --- ПОЛУЧЕНИЕ УРОНА --- //
@@ -436,7 +431,6 @@ export class PlayerClass {
 
         this.eventManager.emit('playerAttacked');
 
-        // Отбрасывание от источника (врага)
         if (source) {
             const angle = Phaser.Math.Angle.Between(source.x, source.y, this.player.x, this.player.y);
             const knockbackSpeed = source.knockbackSpeed;
@@ -514,5 +508,34 @@ export class PlayerClass {
         if (this.player) {
             this.player.setPosition(x, y);
         }
+    }
+
+    // --- ДЕБАГ МЕТОДЫ --- //
+
+    // --- ОТРИСОВКА ЗОНЫ АТАКИ  --- //
+    drawAttackZone() {
+        if (!this.attackZoneGraphic || !this.attackDebug) {
+            if (this.attackZoneGraphic) this.attackZoneGraphic.clear();
+            return;
+        }
+
+        const dir = this.player.flipX ? -1 : 1;
+        const w = this.attackWidth;
+        const fullH = this.attackHeight * 2;
+        const zoneCenterY = this.player.y + this.attackOffsetY;
+
+        let rectX;
+        if (dir === 1) {
+            rectX = this.player.x + this.attackOffsetX;
+        } else {
+            rectX = this.player.x - this.attackOffsetX - w;
+        }
+        const rectY = zoneCenterY - fullH / 2;
+
+        this.attackZoneGraphic.clear();
+        this.attackZoneGraphic.fillStyle(0xff0000, 0.2);
+        this.attackZoneGraphic.fillRect(rectX, rectY, w, fullH);
+        this.attackZoneGraphic.lineStyle(2, 0xff0000, 0.8);
+        this.attackZoneGraphic.strokeRect(rectX, rectY, w, fullH);
     }
 }

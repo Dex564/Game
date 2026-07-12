@@ -11,11 +11,18 @@ export class Storage {
         const xp = this.registry.get('xp') ?? Const.defaultXp;
         const health = this.registry.get('health') ?? Const.defaultHealth;
         const maxLevel = this.registry.get('maxLevel') ??  Const.defaultMaxLevel;
+        const maxHp = this.registry.get('maxHp') ?? Const.defaultHealth;
+        const coinMultiplier = this.registry.get('coinMultiplier') ?? 1;
+        const damageMultiplier = this.registry.get('damageMultiplier') ?? 1;
+        
         localStorage.setItem('coins', coins);
         localStorage.setItem('playerLevel', playerLevel);
         localStorage.setItem('xp', xp);
         localStorage.setItem('health', health);
         localStorage.setItem('maxLevel', maxLevel);
+        localStorage.setItem('maxHp', maxHp);
+        localStorage.setItem('coinMultiplier', coinMultiplier);
+        localStorage.setItem('damageMultiplier', damageMultiplier);
         
         for (let i = 1; i <= maxLevel; i++) {
             if (!this.registry.has(`layout-${i}`)) return;
@@ -35,17 +42,31 @@ export class Storage {
         const xp = localStorage.getItem('xp') ?? Const.defaultXp;
         const health = localStorage.getItem('health') ?? Const.defaultHealth;
         const maxLevel = localStorage.getItem('maxLevel') ??  Const.defaultMaxLevel;
+        const maxHp = localStorage.getItem('maxHp') ?? Const.defaultHealth;
+        const coinMultiplier = localStorage.getItem('coinMultiplier') ?? 1;
+        const damageMultiplier = localStorage.getItem('damageMultiplier') ?? 1;
+
         this.registry.set('coins', Number(coins));
         this.registry.set('playerLevel', Number(playerLevel));
         this.registry.set('xp', Number(xp));
         this.registry.set('health', Number(health));
         this.registry.set('maxLevel', Number(maxLevel));
+        this.registry.set('maxHp', Number(maxHp));
+        this.registry.set('coinMultiplier', Number(coinMultiplier));
+        this.registry.set('damageMultiplier', Number(damageMultiplier));
         
         for (let i = 1; i <= maxLevel; i++) {
-            if (!localStorage.getItem(`layout-${i}`)) return;
             const layout = localStorage.getItem(`layout-${i}`);
-            this.registry.set(`layout-${i}`, JSON.parse(layout));
+            if (layout) {
+                this.registry.set(`layout-${i}`, JSON.parse(layout));
+            }
         }
+    }
+
+    inc(key, amount) {
+        const current = this.registry.get(key) ?? 0;
+        const newValue = current + amount;
+        this.save(key, newValue);
     }
 
     exists() {
