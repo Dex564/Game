@@ -97,13 +97,13 @@ export class Lobby extends Scene {
 
     spawnAltar(x, y) {
         this.altar = this.add.image(x, y, 'altar').setOrigin(0.5, 1);
-        this.altarHint1 = this.add.text(x, y-60, 'Алтарь', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+        this.altarHint1 = this.add.text(x, y-70, 'Алтарь', hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
         this.altarHint2 = this.add.text(x, y-40, `[E]`, hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
     }
 
     spawnShop(x, y) {
         this.shop = this.add.image(x, y, 'shop').setOrigin(0.5, 1);
-        this.shopHint = this.add.text(x, y-40, `[E]`, hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+        this.shopHint = this.add.text(x, y-100, `[E]`, hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
     }
 
     openAltar() {
