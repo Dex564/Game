@@ -28,9 +28,12 @@ export class CaveLevel extends Scene {
     
     create() {
         this.storage = new Storage(this.registry);
+        this.storage.load();
+        if (this.scene.isActive('HUD')) {
+            this.scene.stop('HUD');
+        }
         this.scene.launch('HUD', 'CaveLevel');
         this.add.image(0, 0, 'bgcave').setOrigin(0);
-        // this.add.image(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE/2, 0, 'bgcave').setOrigin(0);
         
         this.playerHandler = new PlayerClass(this, CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE, CHUNKS_Y*TILE_SIZE_Y*CHUNK_SIZE);
         this.player = this.playerHandler.createPlayer();
@@ -149,13 +152,16 @@ export class CaveLevel extends Scene {
     }
     
     generateObjects() {
+        const occupied = new Set();
+
         let pushed = [];
         for (let i = 0; i < chestsAttempts; i++) {
             const x = getRandomInt(0, CHUNKS_X-1);
             const y = getRandomInt(0, CHUNKS_Y-1);
-            if (!this.layout[y][x][1]) {
+            if (!this.layout[y][x][1] && !occupied.has(`${x},${y}`)) {
                 this.chests.push({id: pushed.length, x, y, looted: false, hitbox: null, hint: null});
                 pushed.push(`${x}-${y}`);
+                occupied.add(`${x},${y}`)
             }
         }
         
@@ -163,7 +169,7 @@ export class CaveLevel extends Scene {
         for (let i = 0; i < enemiesAttempts; i++) {
             const x = getRandomInt(0, CHUNKS_X-1);
             const y = getRandomInt(0, CHUNKS_Y-1);
-            if (!this.layout[y][x][1]) {
+            if (!this.layout[y][x][1] && !occupied.has(`${x},${y}`)) {
                 let type = 'bat';
                 const level = this.number;
                 if (level > 3) {
@@ -176,6 +182,7 @@ export class CaveLevel extends Scene {
                     hitbox: null
                 });
                 pushed.push(`${x}-${y}`);
+                occupied.add(`${x},${y}`)
             }
         }
     }
@@ -253,7 +260,7 @@ export class CaveLevel extends Scene {
     openChest(chest, index) {
         this.sound.play(`chest`);
         const coins = getRandomInt(10, 20+this.number);
-        this.registry.inc('coins', coins);
+        this.playerHandler.getCoins(coins);
         this.sound.play(`coins${getRandomInt(1, 6)}`);
         this.chests[index].looted = true;
         chest.hitbox.setTexture('chest_opened');
