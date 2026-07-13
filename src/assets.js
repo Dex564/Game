@@ -152,9 +152,29 @@ export default {
             key: 'shop',
             args: ['assets/shop.png'],
         },
-        HpMultiplierCard: {
-            key: 'HpMultiplierCard',
-            args: ['assets/playerUpgrades/cards/HpMultiplierCard.png']
+        cardHeal10: {
+            key: 'cardHeal10',
+            args: ['assets/playerUpgrades/shop/cardHeal10.png']
+        },
+        cardHeal25: {
+            key: 'cardHeal25',
+            args: ['assets/playerUpgrades/shop/cardHeal25.png']
+        },
+        cardHeal50: {
+            key: 'cardHeal50',
+            args: ['assets/playerUpgrades/shop/cardHeal50.png']
+        },
+        cardHeal100: {
+            key: 'cardHeal100',
+            args: ['assets/playerUpgrades/shop/cardHeal100.png']
+        },
+        back_button: {
+            key: 'back_button',
+            args: ['assets/back_button.png']
+        },
+        HPMultiplierCard: {
+            key: 'HPMultiplierCard',
+            args: ['assets/playerUpgrades/cards/HPMultiplierCard.png']
         },
         cardTenMaxHp: {
             key: 'CardTenMaxHp',
@@ -162,11 +182,11 @@ export default {
         },
         cardFifteenMaxHp: {
             key: 'CardFifteenMaxHp',
-            args: ['assets/playerUpgrades/cards/cardFiteenMaxHp.png']
+            args: ['assets/playerUpgrades/cards/cardFifteenMaxHP.png']
         },
         cardFiftyMaxHp: {
             key: 'CardFiftyMaxHp',
-            args: ['assets/playerUpgrades/cards/cardFityMaxHp.png']
+            args: ['assets/playerUpgrades/cards/cardFiftyMaxHP.png']
         },
         cardDoubleCoins: {
             key: 'CardDoubleCoins',
@@ -188,26 +208,6 @@ export default {
             key: 'CardDoubleDamage',
             args: ['assets/playerUpgrades/cards/doubleDamageCard.png']
         },
-        cardHeal10: {
-            key: 'cardHeal10',
-            args: ['assets/playerUpgrades/shop/cardHeal10.png']
-        },
-        cardHeal25: {
-            key: 'cardHeal25',
-            args: ['assets/playerUpgrades/shop/cardHeal25.png']
-        },
-        cardHeal50: {
-            key: 'cardHeal50',
-            args: ['assets/playerUpgrades/shop/cardHeal50.png']
-        },
-        cardHeal100: {
-            key: 'cardHeal100',
-            args: ['assets/playerUpgrades/shop/cardHeal100.png']
-        },
-        back_button: {
-            key: 'back_button',
-            args: ['assets/back_button.png']
-        },
         cardFiveDamage: {
             key: 'CardFiveDamage',
             args: ['assets/playerUpgrades/cards/cardFiveDamage.png']
@@ -216,9 +216,9 @@ export default {
             key: 'CardTenDamage',
             args: ['assets/playerUpgrades/cards/cardTenDamage.png']
         },
-        cardFiteenDamage: {
-            key: 'CardFiteenDamage',
-            args: ['assets/playerUpgrades/cards/cardFiteenDamage.png']
+        cardFifteenDamage: {
+            key: 'CardFifteenDamage',
+            args: ['assets/playerUpgrades/cards/cardFifteenDamage.png']
         },
     },
     'spritesheet': {

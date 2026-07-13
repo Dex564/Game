@@ -31,8 +31,8 @@ export class Lobby extends Scene {
 
         this.spawnCaveEntry(WIDTH/2-500, HEIGHT-50);
 
-        this.spawnAltar(WIDTH/2-50, HEIGHT-50);
-        this.spawnShop(WIDTH/2+200, HEIGHT-50);
+        // this.spawnAltar(WIDTH/2-50, HEIGHT-50);
+        this.spawnShop(WIDTH/2-50, HEIGHT-50); // WIDTH/2+200
 
         this.events.on('resume', () => {
             this.opening = false;
@@ -61,18 +61,18 @@ export class Lobby extends Scene {
             this.enterCave();
         }
 
-        const altarBounds = this.altar.getBounds();
+        // const altarBounds = this.altar.getBounds();
 
-        const nearAltar = Phaser.Geom.Intersects.RectangleToRectangle(
-            playerBounds, altarBounds
-        );
+        // const nearAltar = Phaser.Geom.Intersects.RectangleToRectangle(
+        //     playerBounds, altarBounds
+        // );
 
-        this.altarHint1.setVisible(nearAltar);
-        this.altarHint2.setVisible(nearAltar);
+        // this.altarHint1.setVisible(nearAltar);
+        // this.altarHint2.setVisible(nearAltar);
 
-        if (nearAltar && this.playerHandler.keys.e.isDown) {
-            this.openAltar();
-        }
+        // if (nearAltar && this.playerHandler.keys.e.isDown) {
+        //     this.openAltar();
+        // }
 
 
         const shopBounds = this.shop.getBounds();

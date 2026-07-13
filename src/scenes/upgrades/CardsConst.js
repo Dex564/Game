@@ -82,7 +82,7 @@ export const CARDS = [
     },
     {
         id: 'maxHpMultiplier',
-        imageKey: 'HpMultiplierCard',
+        imageKey: 'HPMultiplierCard',
         weight: 4,
         apply(player) {
             player.maxHp *= 2;

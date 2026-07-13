@@ -18,55 +18,33 @@ export class ShopMenu extends Scene {
             stroke: '#000000', 
             strokeThickness: 8 
         }).setOrigin(0.5, 0);
+
+        const values = [10, 25, 50, 100];
+        for (const index in values) {
+            const value = values[index];
+            const offsetX = index*200;
+            this.add.image(WIDTH/2-300+offsetX, HEIGHT/2, `cardHeal${value}`)
+                .setInteractive({ useHandCursor: true })
+                .setScale(2.5)
+                .on('pointerdown', () => {
+                    this.processBuy(value);
+                    this.scene.resume(parentLevel);
+                    this.scene.pause(parentLevel);
+                });
+            this.add.text(WIDTH/2-300+offsetX, HEIGHT/2-250, `${value} монет`, hintStyle).setOrigin(0.5, 0).setScale(1.5);
+        }
+
+        this.add.image(WIDTH/2, HEIGHT-300, 'back_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
+            this.scene.resume(parentLevel);
+            this.scene.stop('ShopMenu');
+        }).setOrigin(0.5, 0);
+
         this.input.keyboard.on('keydown', (key) => {
             if (key.code == 'Escape') {
                 this.scene.resume(parentLevel);
                 this.scene.stop('ShopMenu');
             }
         });
-
-        this.add.image(WIDTH/2-300, HEIGHT/2, 'cardHeal10')
-            .setInteractive({ useHandCursor: true })
-            .setScale(2)
-            .on('pointerdown', () => {
-                this.processBuy(10);
-                this.scene.resume(parentLevel);
-                this.scene.pause(parentLevel);
-            });
-        this.add.image(WIDTH/2-100, HEIGHT/2, 'cardHeal25')
-            .setInteractive({ useHandCursor: true })
-            .setScale(2)
-            .on('pointerdown', () => {
-                this.processBuy(25);
-                this.scene.resume(parentLevel);
-                this.scene.pause(parentLevel);
-            });
-        this.add.image(WIDTH/2+100, HEIGHT/2, 'cardHeal50')
-            .setInteractive({ useHandCursor: true })
-            .setScale(2)
-            .on('pointerdown', () => {
-                this.processBuy(50);
-                this.scene.resume(parentLevel);
-                this.scene.pause(parentLevel);
-            });
-        this.add.image(WIDTH/2+300, HEIGHT/2, 'cardHeal100')
-            .setInteractive({ useHandCursor: true })
-            .setScale(2)
-            .on('pointerdown', () => {
-                this.processBuy(100);
-                this.scene.resume(parentLevel);
-                this.scene.pause(parentLevel);
-            });
-
-        this.add.text(WIDTH/2-300, HEIGHT/2-200, '10 монет', hintStyle).setOrigin(0.5, 0).setScale(1.5);
-        this.add.text(WIDTH/2-100, HEIGHT/2-200, '25 монет', hintStyle).setOrigin(0.5, 0).setScale(1.5);
-        this.add.text(WIDTH/2+100, HEIGHT/2-200, '50 монет', hintStyle).setOrigin(0.5, 0).setScale(1.5);
-        this.add.text(WIDTH/2+300, HEIGHT/2-200, '100 монет', hintStyle).setOrigin(0.5, 0).setScale(1.5);
-
-        this.add.image(WIDTH/2, HEIGHT-300, 'back_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
-            this.scene.resume(parentLevel);
-            this.scene.stop('ShopMenu');
-        }).setOrigin(0.5, 0);
     }
 
     processBuy(requireCoins) {

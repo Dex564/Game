@@ -72,8 +72,8 @@ export class HUD extends Scene {
         ).setOrigin(0, 1);
 
         this.expText = this.add.text(
-            expBarX + expBarWidth / 2,
-            expBarY - this.barHeight / 2,
+            expBarX + expBarWidth / 2 + 8,
+            expBarY - this.barHeight / 2 - 8,
             `0 / 100`,
             {
                 fontFamily: 'Arial Black',
