@@ -4,7 +4,7 @@ export class Bat extends Enemy {
     constructor(scene, x, y) {
         super(scene, x, y, 'batEnemy');
         this.hp = 20;
-        this.xp = 100;
+        this.xp = 30;
         this.speed = 120;
         
         this.gettingDamaged = false;

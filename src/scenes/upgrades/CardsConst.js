@@ -5,7 +5,7 @@ export const CARDS = [
         weight: 15,
         apply(player) {
             player.maxHp += 10;
-            player.storage.save('maxTenHp', player.maxHp);
+            player.storage.save('maxHp', player.maxHp);
         }
     },
     {
@@ -13,8 +13,8 @@ export const CARDS = [
         imageKey: 'CardTenMoney',
         weight: 15,
         apply(player) {
-            player.baseCoinsIncrease += 10;
-            player.storage.save('coinForChestTen', player.baseCoinsIncrease);
+            // player.baseCoinsIncrease += 10;
+            player.storage.save('coins', player.storage.get('coins')+=10);
         }
     },
     {
@@ -23,7 +23,7 @@ export const CARDS = [
         weight: 15,
         apply(player) {
             player.baseDamageIncrease += 5;
-            player.storage.save('CardFiveDamage', player.baseDamageIncrease);
+            player.storage.save('baseDamageIncrease', player.baseDamageIncrease);
         }
     },
     {
@@ -32,7 +32,7 @@ export const CARDS = [
         weight: 8,
         apply(player) {
             player.maxHp += 15;
-            player.storage.save('maxFifteenHp', player.maxHp);
+            player.storage.save('maxHp', player.maxHp);
         }
     },
     {
@@ -40,8 +40,8 @@ export const CARDS = [
         imageKey: 'CardFifteenMoney',
         weight: 8,
         apply(player) {
-            player.baseCoinsIncrease += 15;
-            player.storage.save('coinForChestFifteen', player.baseCoinsIncrease);
+            // player.baseCoinsIncrease += 15;
+            player.storage.save('coins', player.storage.get('coins')+15);
         }
     },
     {
@@ -50,7 +50,7 @@ export const CARDS = [
         weight: 8,
         apply(player) {
             player.baseDamageIncrease += 10;
-            player.storage.save('CardTenDamage', player.baseDamageIncrease);
+            player.storage.save('baseDamageIncrease', player.baseDamageIncrease);
         }
     },
     {
@@ -59,7 +59,7 @@ export const CARDS = [
         weight: 7,
         apply(player) {
             player.maxHp += 50;
-            player.storage.save('maxFiftyHp', player.maxHp);
+            player.storage.save('maxHp', player.maxHp);
         }
     },
     {
@@ -67,8 +67,8 @@ export const CARDS = [
         imageKey: 'CardFiftyMoney',
         weight: 7,
         apply(player) {
-            player.baseCoinsIncrease += 50;
-            player.storage.save('coinForChestFifty', player.baseCoinsIncrease);
+            // player.baseCoinsIncrease += 50;
+           player.storage.save('coins', player.storage.get('coins')+50);
         }
     },
     {
@@ -77,7 +77,7 @@ export const CARDS = [
         weight: 7,
         apply(player) {
             player.baseDamageIncrease += 15;
-            player.storage.save('CardFifteenDamage', player.baseDamageIncrease);
+            player.storage.save('baseDamageIncrease', player.baseDamageIncrease);
         }
     },
     {
@@ -86,7 +86,7 @@ export const CARDS = [
         weight: 4,
         apply(player) {
             player.maxHp *= 2;
-            player.storage.save('maxHpMultiplier', player.maxHp);
+            player.storage.save('maxHp', player.maxHp);
         }
     },
     {
@@ -94,8 +94,8 @@ export const CARDS = [
         imageKey: 'CardDoubleCoins',
         weight: 3,
         apply(player) {
-            player.coinMultiplier *= 2;
-            player.storage.save('coinMultiplier', player.coinMultiplier);
+            // player.coinMultiplier *= 2;
+            player.storage.save('coins', player.storage.get('coins')*2);
         }
     },
     {

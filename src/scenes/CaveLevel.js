@@ -260,7 +260,7 @@ export class CaveLevel extends Scene {
     openChest(chest, index) {
         this.sound.play(`chest`);
         const coins = getRandomInt(10, 20+this.number);
-        this.playerHandler.getCoins(coins);
+        this.storage.inc('coins', coins);
         this.sound.play(`coins${getRandomInt(1, 6)}`);
         this.chests[index].looted = true;
         chest.hitbox.setTexture('chest_opened');

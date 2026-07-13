@@ -347,7 +347,7 @@ export class PlayerClass {
             this.canControl = false;
             this.canDash = false;
             this.player.setVelocityX(0);
-            this.scene.sound.play(`swing`);
+            this.scene.sound.play(`swing`, { volume: 0.5 });
             this.performAttack();
 
             this.scene.time.delayedCall(Const.ATTACK_DURATION, () => {
@@ -420,12 +420,6 @@ export class PlayerClass {
         this.invincible = true;
 
         mainScene.scene.launch('LevelUp', { player: this, parentScene: this.scene.sys.settings.key });
-    }
-
-    // --- ПОЛУЧЕНИЕ МОНЕТ --- //
-    getCoins(coins) {
-        let coinsGained = (coins + this.baseCoinsIncrease) * this.coinMultiplier;
-        this.storage.inc('coins', coinsGained);
     }
     
     // --- ПОЛУЧЕНИЕ УРОНА --- //
