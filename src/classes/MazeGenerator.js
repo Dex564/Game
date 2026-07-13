@@ -33,7 +33,6 @@ export class MazeGenerator {
             [0, 1, 3]
         ];
         
-        // TODO: Phaser.Utils.Array.Shuffle(array);
         for (let i = directions.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [directions[i], directions[j]] = [directions[j], directions[i]];

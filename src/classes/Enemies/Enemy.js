@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { EventManager } from '../EventManager.js';
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
@@ -14,6 +15,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.justDied = false;
         this.xp = 0;
         this.knockbackSpeed = 0;
+
+        this.eventManager = EventManager.getInstance();
     }
 
     // Общий метод получения урона – может быть переопределён в наследниках
@@ -25,6 +28,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.justDied = true;
             this.scene.time.delayedCall(100, () => this.justDied = false);
             this.destroy();
+            this.eventManager.emit('enemyDead');
         }
     }
 

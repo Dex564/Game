@@ -58,6 +58,7 @@ export class CaveLevel extends Scene {
             } else {
                 this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             }
+            this.saveLevel();
             console.log(`Loaded room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         } else {
             this.entryY = this.registry.get(`layout-${this.number-1}`)?.leaveY ?? 0;
@@ -115,6 +116,10 @@ export class CaveLevel extends Scene {
                 this.inCombat = false;
             });
         });
+
+        this.eventManager.on('enemyDead', (id) => {
+            this.saveLevel();
+        });
     }
 
     saveLevel() {
@@ -127,8 +132,7 @@ export class CaveLevel extends Scene {
                 id: e.id,
                 x: e.x,
                 y: e.y,
-                type: e.type,
-                health: e.health,
+                type: e.type
             }))
         });
     }
@@ -248,9 +252,6 @@ export class CaveLevel extends Scene {
                     break;
                 default:
                     enemy = new Skeleton(this, posX, posY);
-            }
-            if (enemyData.health) {
-                enemy.hp = enemyData.health;
             }
             this.enemiesGroup.add(enemy);
             this.enemies[index].hitbox = enemy;
