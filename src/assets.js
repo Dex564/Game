@@ -163,6 +163,26 @@ export default {
         cardDoubleDamage: {
             key: 'CardDoubleDamage',
             args: ['assets/playerUpgrades/cards/doubleDamageCard.png']
+        },
+        cardHeal10: {
+            key: 'cardHeal10',
+            args: ['assets/playerUpgrades/shop/cardHeal10.png']
+        },
+        cardHeal25: {
+            key: 'cardHeal25',
+            args: ['assets/playerUpgrades/shop/cardHeal25.png']
+        },
+        cardHeal50: {
+            key: 'cardHeal50',
+            args: ['assets/playerUpgrades/shop/cardHeal50.png']
+        },
+        cardHeal100: {
+            key: 'cardHeal100',
+            args: ['assets/playerUpgrades/shop/cardHeal100.png']
+        },
+        back_button: {
+            key: 'back_button',
+            args: ['assets/back_button.png']
         }
     },
     'spritesheet': {

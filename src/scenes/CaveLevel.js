@@ -172,9 +172,9 @@ export class CaveLevel extends Scene {
             if (!this.layout[y][x][1] && !occupied.has(`${x},${y}`)) {
                 let type = 'bat';
                 const level = this.number;
-                if (level > 3) {
-                    type = 'skeleton';
-                }
+                // if (level > 3) {
+                //     type = 'skeleton';
+                // }
                 this.enemies.push({
                     id: pushed.length,
                     x, y,
