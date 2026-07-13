@@ -49,7 +49,7 @@ export class Preloader extends Scene {
         const storage = new Storage(this.registry);
         storage.load();
 
-        this.game.sound.volume = 0.4;
+        this.game.sound.volume = 0.6;
     }
 
     create() {

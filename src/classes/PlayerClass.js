@@ -222,7 +222,7 @@ export class PlayerClass {
         if (jump && (onGround || this.coyoteTimer > 0)) {
             if (!this.jumpSound) {
                 this.jumpSound = true;
-                this.scene.sound.play(`jump${getRandomInt(1, 2)}`);
+                this.scene.sound.play(`jump${getRandomInt(1, 2)}`, { volume: 0.8 });
                 this.scene.time.delayedCall(500, () => { this.jumpSound = false; });
             }
             this.player.setVelocityY(Const.JUMP_SPEED);
@@ -245,8 +245,10 @@ export class PlayerClass {
 
         if (wantJump) {
             if (touchingLeft && this.wallJumpRight) {
+                this.scene.sound.play(`jump${getRandomInt(1, 2)}`, { volume: 0.8 });
                 this.performWallJump('right');
             } else if (touchingRight && this.wallJumpLeft) {
+                this.scene.sound.play(`jump${getRandomInt(1, 2)}`, { volume: 0.8 });
                 this.performWallJump('left');
             }
         }
@@ -307,6 +309,8 @@ export class PlayerClass {
         this.canDash = false;
         this.isDashing = true;
 
+        this.scene.sound.play(`dash${getRandomInt(1, 2)}`, { volume: 0.3 });
+
         this.scene.time.delayedCall(Const.DASH_DURATION, () => { this.isDashing = false; });
         this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => { this.canDash = true; });
         this.scene.time.delayedCall(Const.DASH_COOLDOWN, () => { this.invincible = false; });
@@ -343,7 +347,7 @@ export class PlayerClass {
             this.canControl = false;
             this.canDash = false;
             this.player.setVelocityX(0);
-
+            this.scene.sound.play(`swing`);
             this.performAttack();
 
             this.scene.time.delayedCall(Const.ATTACK_DURATION, () => {
@@ -383,6 +387,7 @@ export class PlayerClass {
 
             if (zoneLeft < enemyRight && zoneRight > enemyLeft &&
                 zoneTop < enemyBottom && zoneBottom > enemyTop) {
+                this.scene.sound.play(`hit${getRandomInt(1, 2)}`, { volume: 0.5 });
                 enemy.takeDamage(effectiveDamage);
                 if (enemy.justDied) {
                     this.xp += enemy.xp * this.xpModifier;
@@ -431,6 +436,7 @@ export class PlayerClass {
         this.invincible = true;
 
         this.eventManager.emit('playerAttacked');
+        this.scene.sound.play(`hit${getRandomInt(1, 2)}`, { volume: 0.5 });
 
         if (source) {
             const angle = Phaser.Math.Angle.Between(source.x, source.y, this.player.x, this.player.y);

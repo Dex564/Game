@@ -10,11 +10,6 @@ export default {
             path: 'assets/sounds/',
             format: 'ogg'
         },
-        wallslide: {
-            files: ['wallslide'],
-            path: 'assets/sounds/',
-            format: 'ogg'
-        },
         hit: {
             files: ['hit1', 'hit2'],
             path: 'assets/sounds/',
@@ -49,7 +44,12 @@ export default {
             files: ['dash1', 'dash2'],
             path: 'assets/sounds/',
             format: 'ogg'
-        }
+        },
+        swing: {
+            files: ['swing'],
+            path: 'assets/sounds/',
+            format: 'ogg'
+        },
     },
     'image': {
         background: {
