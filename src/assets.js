@@ -151,6 +151,18 @@ export default {
         shop: {
             key: 'shop',
             args: ['assets/shop.png']
+        },
+        cardTenMaxHp: {
+            key: 'CardTenMaxHp',
+            args: ['assets/playerUpgrades/cards/cardTenMaxHp.png']
+        },
+        cardDoubleCoins: {
+            key: 'CardDoubleCoins',
+            args: ['assets/playerUpgrades/cards/cardDoubleCoins.png']
+        },
+        cardDoubleDamage: {
+            key: 'CardDoubleDamage',
+            args: ['assets/playerUpgrades/cards/doubleDamageCard.png']
         }
     },
     'spritesheet': {

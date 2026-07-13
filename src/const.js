@@ -27,7 +27,6 @@ export const defaultXp = 0;
 export const defaultHealth = 100;
 export const defaultMaxLevel = 1;
 
-// ========== Оружие и зона атаки ==========
 export const WEAPONS = {
     sword: {
         width: 35,
@@ -44,7 +43,7 @@ export const WEAPONS = {
         damage: 12
     },
 };
-export const DEFAULT_WEAPON = 'spear';   // стартовое оружие
+export const DEFAULT_WEAPON = 'spear';
 
 // Генерация
 export const TILE_SIZE_X = 128;
@@ -52,8 +51,8 @@ export const TILE_SIZE_Y = 64;
 export const CHUNK_SIZE = 4;
 export const CHUNKS_X = 10;
 export const CHUNKS_Y = 5;
-export const chestsAttempts = 5;
-export const enemiesAttempts = 15;
+export const chestsAttempts = 10;
+export const enemiesAttempts = 25;
 
 export const hintStyle = {
     fontSize: '20px',
