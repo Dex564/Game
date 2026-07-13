@@ -70,7 +70,8 @@ export class PlayerClass {
         this.xpModifier = 1;
         this.coinMultiplier = this.scene.registry.get('coinMultiplier') ?? 1;
         this.damageMultiplier = this.scene.registry.get('damageMultiplier') ?? 1;
-        this.baseCoinsIncrease = 0;
+        this.baseDamageIncrease = this.scene.registry.get('baseDamageIncrease') ?? 1;
+        this.baseCoinsIncrease = this.scene.registry.get('baseCoinsIncrease') ?? 0;
 
         // Графика для отладки зоны атаки
         this.attackZoneGraphic = null;
@@ -356,7 +357,7 @@ export class PlayerClass {
     performAttack() {
         if (!this.scene.enemies || !Array.isArray(this.scene.enemies)) return;
 
-        const effectiveDamage = this.playerDamage * this.damageMultiplier;
+        const effectiveDamage = (this.playerDamage + this.baseDamageIncrease) * this.damageMultiplier;
         const dir = this.player.flipX ? -1 : 1;
         let zoneLeft, zoneRight;
         if (dir === 1) {

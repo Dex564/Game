@@ -8,7 +8,7 @@ export class LevelUpScene extends Phaser.Scene {
 
     init(data) {
         this.player = data.player;
-        this.parentSceneKey = data.parentScene;
+        this.parentSceneKey = data.parentScene || 'CaveLevel';
     }
 
     create() {
@@ -27,25 +27,47 @@ export class LevelUpScene extends Phaser.Scene {
         const gap = 140;
         const totalWidth = cardWidth * 2 + gap;
         const startX = (width - totalWidth) / 2 + cardWidth / 2;
-        const cardY = height / 2;
+        const targetY = height / 2;
 
         this.cardSprites = [];
         this.chosenCards.forEach((cardDef, index) => {
-            const x = startX + index * (cardWidth + gap);
-            const sprite = this.add.image(x, cardY, cardDef.imageKey)
-                    .setScrollFactor(0)
-                    .setDepth(1)
-                    .setInteractive({ useHandCursor: true })
-                    .setDisplaySize(cardWidth, cardHeight);
-                sprite.on('pointerover', () => sprite.setTint(0xcccccc));
-                sprite.on('pointerout', () => sprite.clearTint());
-                sprite.on('pointerdown', () => {
-                cardDef.apply(this.player);
-                this.cleanUp();
-                this.resumeGame();
+            const targetX = startX + index * (cardWidth + gap);
+            const startY = -cardHeight;
+
+            const sprite = this.add.image(targetX, startY, cardDef.imageKey)
+                .setScrollFactor(0)
+                .setDepth(1)
+                .setInteractive({ useHandCursor: true })
+                .setDisplaySize(cardWidth, cardHeight);
+
+            sprite.on('pointerover', () => sprite.setTint(0xcccccc));
+            sprite.on('pointerout', () => sprite.clearTint());
+            sprite.on('pointerdown', () => {
+                this.cardSprites.forEach(s => s.disableInteractive());
+                this.tweens.add({
+                    targets: sprite,
+                    scaleX: 1.3,
+                    scaleY: 1.3,
+                    alpha: 0,
+                    duration: 200,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        cardDef.apply(this.player);
+                        this.cleanUp();
+                        this.resumeGame();
+                    }
+                });
             });
 
             this.cardSprites.push(sprite);
+
+            this.tweens.add({
+                targets: sprite,
+                y: targetY,
+                duration: 600,
+                ease: 'Back.easeOut',
+                delay: index * 150
+            });
         });
     }
 

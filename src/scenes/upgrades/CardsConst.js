@@ -14,7 +14,7 @@ export const CARDS = [
         weight: 100,
         apply(player) {
             player.coinMultiplier *= 2;
-            player.storage.save('coinMultiplier', player.coinMultiplier)
+            player.storage.save('coinMultiplier', player.coinMultiplier);
         }
     },
     {
@@ -23,7 +23,7 @@ export const CARDS = [
         weight: 100,
         apply(player) {
             player.damageMultiplier *= 2;
-            player.storage.save('damageMultiplier', player.damageMultiplier)
+            player.storage.save('damageMultiplier', player.damageMultiplier);
         }
     }
 ];
