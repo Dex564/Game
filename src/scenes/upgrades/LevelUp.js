@@ -22,9 +22,9 @@ export class LevelUpScene extends Phaser.Scene {
         const card2 = remaining.length > 0 ? this.weightedRandom(remaining) : card1;
         this.chosenCards = [card1, card2];
 
-        const cardWidth = 64;
-        const cardHeight = 128;
-        const gap = 40;
+        const cardWidth = 128;
+        const cardHeight = 256;
+        const gap = 140;
         const totalWidth = cardWidth * 2 + gap;
         const startX = (width - totalWidth) / 2 + cardWidth / 2;
         const cardY = height / 2;

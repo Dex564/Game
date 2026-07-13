@@ -7,7 +7,7 @@ export class HUD extends Scene {
     }
 
     create(parentScene) {
-        this.barMaxWidth = 500 - 10;
+        this.barMaxWidth = 350;
         this.barX = 25;
         this.barY = HEIGHT - 20;
         this.barHeight = 22;
@@ -38,6 +38,52 @@ export class HUD extends Scene {
             0x00ff00
         ).setOrigin(0, 1);
 
+        this.healthText = this.add.text(
+            this.barX,
+            this.barY - this.barHeight - 10,
+            `100/100`,
+            {
+                fontFamily: 'Arial Black',
+                fontSize: 24,
+                color: '#ffffff',
+                stroke: '#000000',
+                strokeThickness: 6
+            }
+        ).setOrigin(0, 1);
+
+        const expBarWidth = 200;
+        const expBarX = WIDTH - 25 - expBarWidth;
+        const expBarY = HEIGHT - 20;
+
+        this.expBarBg = this.add.rectangle(
+            expBarX,
+            expBarY,
+            expBarWidth + 2 * (this.border + this.padding),
+            this.barHeight + 2 * (this.border + this.padding),
+            0x000000
+        ).setOrigin(0, 1);
+
+        this.expBar = this.add.rectangle(
+            expBarX + this.border + this.padding,
+            expBarY - this.border - this.padding,
+            expBarWidth,
+            this.barHeight,
+            0x0088ff
+        ).setOrigin(0, 1);
+
+        this.expText = this.add.text(
+            expBarX + expBarWidth / 2,
+            expBarY - this.barHeight / 2,
+            `0 / 100`,
+            {
+                fontFamily: 'Arial Black',
+                fontSize: 18,
+                color: '#ffffff',
+                stroke: '#000000',
+                strokeThickness: 4
+            }
+        ).setOrigin(0.5, 0.5);
+
         this.registry.events.on('changedata-coins', (parent, value) => {
             this.coinCounter.setText(`Монеты: ${value}`);
         });
@@ -45,11 +91,21 @@ export class HUD extends Scene {
         this.registry.events.on('changedata-health', (parent, value) => {
             this.currentHealth = value;
             this.updateHealthBar();
+            this.updateHealthText();
         });
 
         this.registry.events.on('changedata-maxHp', (parent, value) => {
             this.maxHp = value;
             this.updateHealthBar();
+            this.updateHealthText();
+        });
+
+        this.registry.events.on('changedata-xp', (parent, value) => {
+            this.updateExpBar();
+        });
+
+        this.registry.events.on('changedata-playerLevel', (parent, value) => {
+            this.updateExpBar();
         });
 
         if (parentScene === 'CaveLevel') {
@@ -73,6 +129,8 @@ export class HUD extends Scene {
         this.coinCounter.setText(`Монеты: ${coins}`);
         this.setRooms(current);
         this.updateHealthBar();
+        this.updateHealthText();
+        this.updateExpBar();
     }
 
     updateHealthBar() {
@@ -88,6 +146,26 @@ export class HUD extends Scene {
             this.bar.fillColor = 0xfe9900;
         } else {
             this.bar.fillColor = 0xff0000;
+        }
+    }
+
+    updateHealthText() {
+        if (this.healthText) {
+            this.healthText.setText(`${Math.round(this.currentHealth)}/${Math.round(this.maxHp)}`);
+        }
+    }
+
+    updateExpBar() {
+        const currentXp = this.registry.get('xp') ?? 0;
+        const level = this.registry.get('playerLevel') ?? 1;
+        const maxXp = level * 10 + 100;
+
+        const fraction = Math.min(currentXp / maxXp, 1);
+        const barWidth = 200;
+        this.expBar.width = Math.max(fraction * barWidth, 0);
+
+        if (this.expText) {
+            this.expText.setText(`${Math.round(currentXp)} / ${Math.round(maxXp)}`);
         }
     }
 
