@@ -13,8 +13,8 @@ export const CARDS = [
         imageKey: 'CardTenMoney',
         weight: 15,
         apply(player) {
-            // player.baseCoinsIncrease += 10;
-            player.storage.save('coins', player.storage.get('coins')+=10);
+            player.coins += 10;
+            player.storage.save('coins', player.coins);
         }
     },
     {
@@ -40,8 +40,8 @@ export const CARDS = [
         imageKey: 'CardFifteenMoney',
         weight: 8,
         apply(player) {
-            // player.baseCoinsIncrease += 15;
-            player.storage.save('coins', player.storage.get('coins')+15);
+            player.coins += 15;
+            player.storage.save('coins', player.coins);
         }
     },
     {
@@ -67,8 +67,8 @@ export const CARDS = [
         imageKey: 'CardFiftyMoney',
         weight: 7,
         apply(player) {
-            // player.baseCoinsIncrease += 50;
-           player.storage.save('coins', player.storage.get('coins')+50);
+            player.coins += 50;
+            player.storage.save('coins', player.coins);
         }
     },
     {
@@ -94,8 +94,8 @@ export const CARDS = [
         imageKey: 'CardDoubleCoins',
         weight: 3,
         apply(player) {
-            // player.coinMultiplier *= 2;
-            player.storage.save('coins', player.storage.get('coins')*2);
+            player.coins *= 2;
+            player.storage.save('coins', player.coins);
         }
     },
     {

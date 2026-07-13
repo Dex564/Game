@@ -58,6 +58,8 @@ export class PlayerClass {
         this.xp = this.scene.registry.get('xp') ?? Const.defaultXp;
         this.level = this.scene.registry.get('playerLevel') ?? Const.defaultPlayerLevel;
 
+        this.coins = this.scene.registry.get('coins') ?? Const.defaultCoins;
+
         // Текущее оружие и его параметры
         this.currentWeapon = null;
         this.playerDamage = 0;
