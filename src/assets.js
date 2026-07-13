@@ -150,15 +150,39 @@ export default {
         },
         shop: {
             key: 'shop',
-            args: ['assets/shop.png']
+            args: ['assets/shop.png'],
+        },
+        HpMultiplierCard: {
+            key: 'HpMultiplierCard',
+            args: ['assets/playerUpgrades/cards/HpMultiplierCard.png']
         },
         cardTenMaxHp: {
             key: 'CardTenMaxHp',
             args: ['assets/playerUpgrades/cards/cardTenMaxHp.png']
         },
+        cardFifteenMaxHp: {
+            key: 'CardFifteenMaxHp',
+            args: ['assets/playerUpgrades/cards/cardFiteenMaxHp.png']
+        },
+        cardFiftyMaxHp: {
+            key: 'CardFiftyMaxHp',
+            args: ['assets/playerUpgrades/cards/cardFityMaxHp.png']
+        },
         cardDoubleCoins: {
             key: 'CardDoubleCoins',
             args: ['assets/playerUpgrades/cards/cardDoubleCoins.png']
+        },
+        cardTenMoney: {
+            key: 'CardTenMoney',
+            args: ['assets/playerUpgrades/cards/cardTenMoney.png']
+        },
+        cardFifteenMoney: {
+            key: 'CardFifteenMoney',
+            args: ['assets/playerUpgrades/cards/cardFifteenMoney.png']
+        },
+        cardFiftyMoney: {
+            key: 'CardFiftyMoney',
+            args: ['assets/playerUpgrades/cards/cardFiftyMoney.png']
         },
         cardDoubleDamage: {
             key: 'CardDoubleDamage',
@@ -183,7 +207,19 @@ export default {
         back_button: {
             key: 'back_button',
             args: ['assets/back_button.png']
-        }
+        },
+        cardFiveDamage: {
+            key: 'CardFiveDamage',
+            args: ['assets/playerUpgrades/cards/cardFiveDamage.png']
+        },
+        cardTenDamage: {
+            key: 'CardTenDamage',
+            args: ['assets/playerUpgrades/cards/cardTenDamage.png']
+        },
+        cardFiteenDamage: {
+            key: 'CardFiteenDamage',
+            args: ['assets/playerUpgrades/cards/cardFiteenDamage.png']
+        },
     },
     'spritesheet': {
         player: {
