@@ -96,6 +96,14 @@ export default {
             key: 'menu_button',
             args: ['assets/menu_button.png']
         },
+        leave_button: {
+            key: 'leave_button',
+            args: ['assets/leave_button.png']
+        },
+        info_button: {
+            key: 'info_button',
+            args: ['assets/info_button.png']
+        },
         platform: {
             key: 'ground',
             args: ['assets/ground.png']
@@ -219,6 +227,22 @@ export default {
         cardFifteenDamage: {
             key: 'CardFifteenDamage',
             args: ['assets/playerUpgrades/cards/cardFifteenDamage.png']
+        },
+        guideKey: {
+            key: 'guideKey',
+            args: ['assets/guideKey.png']
+        },
+        guideKeyMedium: {
+            key: 'guideKeyMedium',
+            args: ['assets/guideKeyMedium.png']
+        },
+        guideKeyLong: {
+            key: 'guideKeyLong',
+            args: ['assets/guideKeyLong.png']
+        },
+        leftClick: {
+            key: 'leftClick',
+            args: ['assets/leftClick.png']
         },
     },
     'spritesheet': {

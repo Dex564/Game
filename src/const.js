@@ -61,3 +61,25 @@ export const hintStyle = {
     backgroundColor: '#000000',
     padding: { left: 8, right: 8, top: 4, bottom: 4 }
 };
+
+export const titleStyle = { 
+    fontFamily: 'Arial Black',
+    fontSize: '64px',
+    color: '#ffffff',
+    stroke: '#000000',
+    strokeThickness: 8
+}
+
+export const textStyle = { 
+    fontFamily: 'Arial',
+    fontSize: '42px',
+    color: '#ffffff',
+    stroke: '#000000',
+    strokeThickness: 4
+}
+
+export const keyStyle = { 
+    fontFamily: 'Arial',
+    fontSize: '32px',
+    color: '#000000'
+}

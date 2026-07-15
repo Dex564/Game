@@ -10,6 +10,10 @@ export class Lobby extends Scene {
     create() {
         this.entering = false;
         this.opening = false;
+        if (this.registry.has('firstGame')) {
+            this.scene.launch('Guide', 'Lobby');
+            this.scene.pause('Lobby'); 
+        }
         const health = this.registry.get('health');
         if (health <= 0) {
             this.scene.stop('Lobby');

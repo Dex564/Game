@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import { Storage } from '../classes/Storage.js';
-import { WIDTH, HEIGHT, hintStyle } from "../const";
+import { WIDTH, HEIGHT, titleStyle } from "../const";
 
 export class ShopMenu extends Scene {
     constructor() {
@@ -11,13 +11,7 @@ export class ShopMenu extends Scene {
         const overlay = this.add.graphics();
         overlay.fillStyle(0x000000, 0.7);
         overlay.fillRect(0, 0, WIDTH, HEIGHT);
-        this.add.text(WIDTH/2, 100, 'Магазин восстановления', { 
-            fontFamily: 'Arial Black', 
-            fontSize: 64, 
-            color: '#ffffff', 
-            stroke: '#000000', 
-            strokeThickness: 8 
-        }).setOrigin(0.5, 0);
+        this.add.text(WIDTH/2, 100, 'Магазин восстановления', titleStyle).setOrigin(0.5, 0);
 
         const values = [10, 25, 50, 100];
         for (const index in values) {
