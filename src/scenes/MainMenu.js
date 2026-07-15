@@ -41,8 +41,8 @@ export class MainMenu extends Scene {
         }
 
         this.add.image(WIDTH/2, HEIGHT/2+height, 'leave_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
-            let win = window.open(location.href, '_self');
-            win.close();
+            window.location.href = 'about:blank';
+            window.close();
         });
     }
 
