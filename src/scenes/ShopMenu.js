@@ -25,7 +25,7 @@ export class ShopMenu extends Scene {
                     this.scene.resume(parentLevel);
                     this.scene.pause(parentLevel);
                 });
-            this.add.text(WIDTH/2-300+offsetX, HEIGHT/2-250, `${value} монет`, hintStyle).setOrigin(0.5, 0).setScale(1.5);
+            this.add.text(WIDTH/2-300+offsetX, HEIGHT/2-250, `${value} монет`, 'hintStyle').setOrigin(0.5, 0).setScale(1.5);
         }
 
         this.add.image(WIDTH/2, HEIGHT-300, 'back_button').setInteractive({ useHandCursor: true }).once('pointerdown', () => {
