@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import { Storage } from '../classes/Storage.js';
-import { WIDTH, HEIGHT, titleStyle } from "../const";
+import { WIDTH, HEIGHT, titleStyle, hintStyle } from "../const";
 
 export class ShopMenu extends Scene {
     constructor() {
