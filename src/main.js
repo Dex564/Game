@@ -1,4 +1,3 @@
-import { Boot } from './scenes/Boot';
 import { Lobby } from './scenes/Lobby';
 import { Game } from 'phaser';
 import { MainMenu } from './scenes/MainMenu';
@@ -6,6 +5,12 @@ import { CaveLevel } from './scenes/CaveLevel';
 import { Preloader } from './scenes/Preloader';
 import { HUD } from './scenes/HUD';
 import { Pause } from './scenes/Pause';
+import { InsideTemple } from './scenes/InsideTemple';
+import { GameOver } from './scenes/GameOver';
+import { AltarMenu } from './scenes/AltarMenu';
+import { ShopMenu } from './scenes/ShopMenu';
+import { LevelUpScene } from './scenes/upgrades/LevelUp';
+import { Guide } from './scenes/Guide';
 import * as Phaser from 'phaser';
 import * as Const from './const';
 
@@ -15,7 +20,7 @@ const config = {
     width: Const.WIDTH,
     height: Const.HEIGHT,
     parent: 'game-container',
-    backgroundColor: '#6a7177',
+    backgroundColor: '#181819',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
@@ -29,13 +34,18 @@ const config = {
         }
     },
     scene: [
-        Boot,
         Preloader,
         MainMenu,
         Lobby,
+        InsideTemple,
         CaveLevel,
         HUD,
-        Pause
+        Pause,
+        GameOver,
+        AltarMenu,
+        ShopMenu,
+        LevelUpScene,
+        Guide
     ]
 };
 

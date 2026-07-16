@@ -1,24 +1,39 @@
 import { Scene } from 'phaser';
-import { WIDTH, HEIGHT, chunks, paths } from '../const';
-import { PlayerClass } from "../sprites/PlayerClass";
-import { getRandomInt } from "../utils.js"
-
-const TILE_SIZE_X = 128;
-const TILE_SIZE_Y = 64;
-const CHUNK_SIZE = 4;
-const CHUNKS_X = 10;
-const CHUNKS_Y = 5;
-const chestsAttempts = 5;
+import {
+    WIDTH,
+    HEIGHT,
+    hintStyle,
+    TILE_SIZE_X,
+    TILE_SIZE_Y,
+    CHUNK_SIZE,
+    CHUNKS_X,
+    CHUNKS_Y,
+    chestsAttempts,
+    enemiesAttempts,
+    COMBAT_TIME
+} from '../const.js';
+import { PlayerClass } from "../classes/PlayerClass.js";
+import { getRandomInt, generateChunk } from "../utils.js";
+import { Storage } from '../classes/Storage.js';
+import { MazeGenerator } from '../classes/MazeGenerator.js';
+import { Skeleton } from '../classes/Enemies/Skeleton.js';
+import { Bat } from '../classes/Enemies/Bat.js';
+import { EventManager } from '../classes/EventManager.js';
 
 export class CaveLevel extends Scene {
     constructor() {
         super('CaveLevel');
+        this.eventManager = EventManager.getInstance();
     }
     
     create() {
-        this.scene.launch('HUD', 'cave');
+        this.storage = new Storage(this.registry);
+        this.storage.load();
+        if (this.scene.isActive('HUD')) {
+            this.scene.stop('HUD');
+        }
+        this.scene.launch('HUD', 'CaveLevel');
         this.add.image(0, 0, 'bgcave').setOrigin(0);
-        this.add.image(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE/2, 0, 'bgcave').setOrigin(0);
         
         this.playerHandler = new PlayerClass(this, CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE, CHUNKS_Y*TILE_SIZE_Y*CHUNK_SIZE);
         this.player = this.playerHandler.createPlayer();
@@ -36,50 +51,90 @@ export class CaveLevel extends Scene {
             this.leaveY = savedLevel.leaveY;
             this.layout = savedLevel.layout;
             this.chests = savedLevel.chests;
+            this.enemies = savedLevel.enemies;
             const lastAction = this.registry.get(`lastAction`);
             if (lastAction == 'entry') {
-                console.log('going backwards');
-                this.playerHandler.setPlayerPosition(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE-(TILE_SIZE_X*CHUNK_SIZE/2), TILE_SIZE_Y*CHUNK_SIZE*this.leaveY+(TILE_SIZE_Y*CHUNK_SIZE/2));
+                this.playerHandler.setPlayerPosition(CHUNKS_X*TILE_SIZE_X*CHUNK_SIZE-TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.leaveY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             } else {
-                console.log('going forwards');
-                this.playerHandler.setPlayerPosition(TILE_SIZE_X*CHUNK_SIZE/2, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
+                this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
             }
+            this.saveLevel();
+            console.log(`Loaded room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         } else {
-            this.entryY = this.registry.get(`layout-${this.number-1}`)?.entryY ?? 0;
-            this.leaveY = getRandomInt(1, CHUNKS_Y-2);
-            this.layout = this.generateLayout();
+            this.entryY = this.registry.get(`layout-${this.number-1}`)?.leaveY ?? 0;
+            this.leaveY = getRandomInt(0, CHUNKS_Y-1);
+            const generator = new MazeGenerator(CHUNKS_X, CHUNKS_Y);
+            generator.setEntryExit(this.entryY, this.leaveY);
+            this.layout = generator.getMaze();
 
             this.chests = [];
-            let pushed = [];
-            for (let i = 0; i < chestsAttempts; i++) {
-                const x = getRandomInt(0, CHUNKS_X-1);
-                const y = getRandomInt(0, CHUNKS_Y-1);
-                if (!paths[3].has(this.layout[y][x]) && this.layout[y][x] != 11 && !pushed.includes(`${x}-${y}`)) {
-                    this.chests.push({id: pushed.length, x, y, looted: false, hitbox: null, hint: null});
-                    pushed.push(`${x}-${y}`);
-                }
-            }
+            this.enemies = [];
+
+            this.generateObjects();
 
             this.saveLevel();
-            this.playerHandler.setPlayerPosition(TILE_SIZE_X*CHUNK_SIZE/2, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
+            this.playerHandler.setPlayerPosition(TILE_SIZE_X, TILE_SIZE_Y*CHUNK_SIZE*this.entryY+(TILE_SIZE_Y*CHUNK_SIZE/2));
+            console.log(`Generated room - layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
         }
-        console.log(`layout-${this.number}:`, this.registry.get(`layout-${this.number}`));
+
+        this.enemiesGroup = this.physics.add.group({ runChildUpdate: false });
+
         this.drawRoom(this.layout);
         this.drawChests();
+        this.spawnEnemies();
         this.processCollision();
         this.createEntryHitbox();
         this.createLeaveHitbox();
 
+        this.inCombat = false;
+
         this.input.keyboard.on('keydown', (key) => {
+            if (this.inCombat) return;
             if (key.code == 'Escape') {
-                this.scene.launch('Pause');
+                this.scene.launch('Pause', 'CaveLevel');
                 this.scene.pause('CaveLevel');
             }
+        });
+
+        this.eventManager.on('playerDead', () => {
+            console.log('playerDead event');
+            this.scene.pause('CaveLevel');
+            this.scene.stop('HUD');
+            this.scene.transition({
+                target: 'GameOver',
+                duration: 1000,
+                moveBelow: true,
+                onUpdate: (progress) => {
+                    this.cameras.main.setAlpha(1 - progress);
+                }
+            });
+        });
+
+        this.eventManager.on('playerAttacked', () => {
+            this.inCombat = true;
+            this.time.delayedCall(COMBAT_TIME, () => {
+                this.inCombat = false;
+            });
+        });
+
+        this.eventManager.on('enemyDead', (id) => {
+            this.saveLevel();
         });
     }
 
     saveLevel() {
-        this.registry.set(`layout-${this.number}`, { layout: this.layout, entryY: this.entryY, leaveY: this.leaveY, chests: this.chests });
+        this.storage.save(`layout-${this.number}`, { 
+            layout: this.layout,
+            entryY: this.entryY,
+            leaveY: this.leaveY,
+            chests: this.chests,
+            enemies: this.enemies.map(e => ({
+                id: e.id,
+                x: e.x,
+                y: e.y,
+                type: e.type
+            }))
+        });
     }
     
     update() {
@@ -97,68 +152,43 @@ export class CaveLevel extends Scene {
                 this.openChest(chest, index);
             }
         });
+        this.enemies.forEach(e => e.hitbox.update());
     }
     
-    generateLayout() {
-        const layout = [];
-        for (let y = 0; y < CHUNKS_Y; y++) {
-            const layer = [];
-            for (let x = 0; x < CHUNKS_X; x++) {
+    generateObjects() {
+        const occupied = new Set();
 
-                if (this.entryY === y && x === 0) {
-                    layer.push(5);
-                    continue;
-                }
-                else if (this.leaveY === y && x === CHUNKS_X-1) {
-                    layer.push(10);
-                    continue;
-                }
-
-                // left, right, up, down
-                const can = [1, 1, 1, 1];
-                
-                if (layer[x-1] && !paths[1].has(layer[x-1])) {
-                    can[0] = 0;
-                }
-                if (layout[y-1] && !paths[3].has(layout[y-1][x])) {
-                    can[2] = 0;
-                }
-                
-                if (x == 0) can[0] = 0;
-                if (x == CHUNKS_X-1) can[1] = 0;
-                if (y == 0) can[2] = 0;
-                if (y == CHUNKS_Y-1) can[3] = 0;
-                let possible = new Set();
-                if (can[0] && can[2]) {
-                    possible = paths[0].intersection(paths[2]);
-                } else if (can[0] && !can[2]) {
-                    possible = paths[0].difference(paths[2]);
-                } else if (!can[0] && can[2]) {
-                    possible = paths[2].difference(paths[0]);
-                } else if (!can[0] && !can[2]) {
-                    let leftup = paths[0].union(paths[2]);
-                    let rightdown = paths[1].union(paths[3]);
-                    possible = rightdown.difference(leftup);
-                }
-                if (!can[1]) {
-                    possible = possible.difference(paths[1]);
-                }
-                if (!can[3]) {
-                    possible = possible.difference(paths[3]);
-                }
-                possible = [...possible];
-                if (possible.length) {
-                    const randomIndex = Math.floor(Math.random() * possible.length);
-                    const pick = possible[randomIndex];
-                    if (pick != 0 && !pick) console.log(possible, can);
-                    layer.push(pick);
-                } else {
-                    layer.push(11);
-                }
+        let pushed = [];
+        for (let i = 0; i < chestsAttempts; i++) {
+            const x = getRandomInt(0, CHUNKS_X-1);
+            const y = getRandomInt(0, CHUNKS_Y-1);
+            if (!this.layout[y][x][1] && !occupied.has(`${x},${y}`)) {
+                this.chests.push({id: pushed.length, x, y, looted: false, hitbox: null, hint: null});
+                pushed.push(`${x}-${y}`);
+                occupied.add(`${x},${y}`)
             }
-            layout.push(layer);
         }
-        return layout;
+        
+        pushed = [];
+        for (let i = 0; i < enemiesAttempts; i++) {
+            const x = getRandomInt(0, CHUNKS_X-1);
+            const y = getRandomInt(0, CHUNKS_Y-1);
+            if (!this.layout[y][x][1] && !occupied.has(`${x},${y}`)) {
+                let type = 'bat';
+                const level = this.number;
+                // if (level > 3) {
+                //     type = 'skeleton';
+                // }
+                this.enemies.push({
+                    id: pushed.length,
+                    x, y,
+                    type: type, 
+                    hitbox: null
+                });
+                pushed.push(`${x}-${y}`);
+                occupied.add(`${x},${y}`)
+            }
+        }
     }
     
     drawRoom(layout) {
@@ -174,17 +204,14 @@ export class CaveLevel extends Scene {
         
         for (let chunkY = 0; chunkY < CHUNKS_Y; chunkY++) {
             for (let chunkX = 0; chunkX < CHUNKS_X; chunkX++) {
-                const chunkIndex = layout[chunkY][chunkX];
-                const chunk = chunks[chunkIndex];
-                // console.log(chunkX, chunkY, chunkIndex, chunk);
-                // if (!chunk) continue;
+                const chunkData = layout[chunkY][chunkX];
+                const chunk = generateChunk(chunkData);
                 
                 for (let y = 0; y < CHUNK_SIZE; y++) {
                     for (let x = 0; x < CHUNK_SIZE; x++) {
                         const tileX = chunkX * CHUNK_SIZE + x;
                         const tileY = chunkY * CHUNK_SIZE + y;
                         const value = chunk[y][x];
-                        // console.log(tileX, tileY, value);
                         
                         if (value != -1) {
                             this.map.putTileAt(0, tileX, tileY, 'level');
@@ -208,28 +235,62 @@ export class CaveLevel extends Scene {
         });
     }
 
+    spawnEnemies() {
+        this.enemies.forEach((enemyData, index) => {
+            const posX = enemyData.x * TILE_SIZE_X * CHUNK_SIZE + (TILE_SIZE_X * 2);
+            const posY = enemyData.y * TILE_SIZE_Y * CHUNK_SIZE + (TILE_SIZE_Y * (CHUNK_SIZE - 2));
+            
+            let enemy;
+            switch (enemyData.type) {
+                case 'skeleton':
+                    enemy = new Skeleton(this, posX, posY);
+                    // console.log('Enemy created:', enemy, enemy.x, enemy.y, enemy.visible, enemy.texture.key, enemy.width, enemy.height);
+                    break;
+                case 'bat':
+                    enemy = new Bat(this, posX, posY);
+                    // console.log('Enemy created:', enemy, enemy.x, enemy.y, enemy.visible, enemy.texture.key, enemy.width, enemy.height);
+                    break;
+                default:
+                    enemy = new Skeleton(this, posX, posY);
+            }
+            this.enemiesGroup.add(enemy);
+            this.enemies[index].hitbox = enemy;
+        });
+    }
+
     openChest(chest, index) {
-        const coins = getRandomInt(10, 20)
-        this.registry.inc('coins', coins);
-        console.log(`Chest looted, +${coins} coins`)
+        this.sound.play(`chest`);
+        const coins = getRandomInt(10, 20+this.number);
+        this.storage.inc('coins', coins);
+        this.sound.play(`coins${getRandomInt(1, 6)}`);
         this.chests[index].looted = true;
         chest.hitbox.setTexture('chest_opened');
         this.saveLevel();
     }
 
     spawnHint(x, y, text) {
-        return this.add.text(x, y, text, {
-            fontSize: '20px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            padding: { left: 8, right: 8, top: 4, bottom: 4 }
-        }).setOrigin(0.5).setVisible(false).setAlpha(0.7);
+        return this.add.text(x, y, text, hintStyle).setOrigin(0.5).setVisible(false).setAlpha(0.7);
     }
     
     processCollision() {
         this.map.setCollision([0]);
         this.physics.add.collider(this.player, this.layer);
+        this.enemies.forEach((enemy) => {
+            this.physics.add.collider(enemy.hitbox, this.layer);
+        });
+        this.physics.add.overlap(
+            this.player,
+            this.enemiesGroup,
+            this.onPlayerTouchEnemy,
+            null,
+            this
+        );
+    }
+
+    onPlayerTouchEnemy(player, enemy) {
+        if (player.active && enemy.active && !this.playerHandler.invincible) {
+            this.playerHandler.takeDamage(enemy.damage, enemy);
+        }
     }
 
     createEntryHitbox() {
@@ -267,7 +328,7 @@ export class CaveLevel extends Scene {
                     this.registry.set(`lastAction`, 'leave');
                     this.registry.set(`currentLevel`, 1);
                     this.scene.stop('CaveLevel');
-                    this.scene.start('Lobby');
+                    this.scene.start('InsideTemple', 'fromCave');
                 } else {
                     this.registry.set(`lastAction`, 'entry');
                     this.registry.set(`currentLevel`, this.number-1);
@@ -277,6 +338,7 @@ export class CaveLevel extends Scene {
                 this.registry.set(`lastAction`, 'leave');
                 this.registry.set(`currentLevel`, this.number+1);
                 this.registry.set(`maxLevel`, this.number+1);
+                this.storage.saveAll();
                 this.scene.restart();
             }
         });
